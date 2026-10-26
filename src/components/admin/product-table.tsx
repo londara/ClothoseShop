@@ -1,0 +1,225 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { ExternalLink, Pencil, Search, Trash2 } from "lucide-react"
+import { toast } from "sonner"
+
+import { deleteProduct } from "@/app/admin/actions"
+import Image from "@/components/shop/smart-image"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { categories, type Category, type Product } from "@/lib/products"
+import { formatPrice, kh } from "@/lib/site"
+import { cn } from "@/lib/utils"
+
+const categoryLabel = Object.fromEntries(categories.map((c) => [c.value, c.label]))
+
+function DeleteButton({ product }: { product: Product }) {
+  const router = useRouter()
+  const [pending, startTransition] = React.useTransition()
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full text-destructive hover:bg-destructive/10"
+            aria-label={`លុប ${product.name}`}
+          />
+        }
+      >
+        <Trash2 className="size-4" />
+      </AlertDialogTrigger>
+      <AlertDialogContent className="rounded-3xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>លុបផលិតផលនេះមែនទេ?</AlertDialogTitle>
+          <AlertDialogDescription>
+            «{product.name}» នឹងត្រូវលុបចេញពីហាងជាអចិន្ត្រៃយ៍ ហើយមិនអាចយកមកវិញបានទេ។
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="rounded-full">បោះបង់</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            className="rounded-full"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await deleteProduct(product.id)
+                if (result.ok) toast.success(result.message)
+                router.refresh()
+              })
+            }
+          >
+            លុប
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+export function ProductTable({
+  products,
+  shopSlug,
+  saved,
+}: {
+  products: Product[]
+  shopSlug: string
+  saved?: "created" | "updated"
+}) {
+  const router = useRouter()
+  const [query, setQuery] = React.useState("")
+  const [category, setCategory] = React.useState<"all" | Category>("all")
+
+  React.useEffect(() => {
+    if (!saved) return
+    toast.success(saved === "created" ? "បានបន្ថែមផលិតផលថ្មីដោយជោគជ័យ" : "បានកែប្រែផលិតផលដោយជោគជ័យ")
+    router.replace("/admin/products", { scroll: false })
+  }, [saved, router])
+
+  const visible = products.filter(
+    (p) =>
+      (category === "all" || p.categories.includes(category)) &&
+      (!query.trim() || p.name.includes(query.trim()) || p.id.includes(query.trim()))
+  )
+
+  return (
+    <div className="rounded-3xl border border-outline-variant/30 bg-card shadow-sm">
+      <div className="flex flex-col gap-3 border-b border-outline-variant/30 p-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative md:w-72">
+          <Search className="absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ស្វែងរកផលិតផល..."
+            className="h-10 rounded-full pl-10"
+          />
+        </div>
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
+          {categories.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              onClick={() => setCategory(c.value)}
+              className={cn(
+                "rounded-full px-4 py-1 text-xs font-bold whitespace-nowrap transition-colors",
+                category === c.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-surface-high text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="pl-4">ផលិតផល</TableHead>
+            <TableHead>ប្រភេទ</TableHead>
+            <TableHead className="text-right">តម្លៃ</TableHead>
+            <TableHead className="text-right">ស្តុក</TableHead>
+            <TableHead className="pr-4 text-right">សកម្មភាព</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {visible.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                រកមិនឃើញផលិតផលទេ
+              </TableCell>
+            </TableRow>
+          )}
+          {visible.map((p) => (
+            <TableRow key={p.id}>
+              <TableCell className="pl-4">
+                <div className="flex items-center gap-3">
+                  <span className="relative h-14 w-11 shrink-0 overflow-hidden rounded-xl bg-surface-container">
+                    <Image src={p.images[0]} alt={p.name} fill sizes="44px" className="object-cover" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block max-w-64 truncate font-bold">{p.name}</span>
+                    {p.badge && (
+                      <span className="text-xs text-muted-foreground">{p.badge}</span>
+                    )}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {p.categories.map((c) => (
+                    <span key={c} className="rounded-full bg-surface-high px-2 py-0.5 text-[11px]">
+                      {categoryLabel[c]}
+                    </span>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell className="text-right font-bold">{formatPrice(p.price)}</TableCell>
+              <TableCell className="text-right">
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-xs font-bold",
+                    p.stock <= 3 ? "bg-destructive/10 text-destructive" : "bg-surface-high"
+                  )}
+                >
+                  {kh(p.stock)}
+                </span>
+              </TableCell>
+              <TableCell className="pr-4">
+                <div className="flex justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    aria-label="មើលក្នុងហាង"
+                    nativeButton={false}
+                    render={<Link href={`/${shopSlug}/products/${p.id}`} target="_blank" />}
+                  >
+                    <ExternalLink className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    aria-label={`កែប្រែ ${p.name}`}
+                    nativeButton={false}
+                    render={<Link href={`/admin/products/${p.id}/edit`} />}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <DeleteButton product={p} />
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}
