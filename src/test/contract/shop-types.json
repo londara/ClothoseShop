@@ -1,0 +1,19 @@
+{
+  "data" : [ {
+    "code" : "couture",
+    "label" : "ម៉ូដសម្លៀកបំពាក់",
+    "sizeKind" : "clothing"
+  }, {
+    "code" : "jewelry",
+    "label" : "គ្រឿងអលង្ការ",
+    "sizeKind" : "none"
+  }, {
+    "code" : "ceramics",
+    "label" : "សេរ៉ាមិច និងវត្ថុតុបតែង",
+    "sizeKind" : "none"
+  }, {
+    "code" : "leather",
+    "label" : "ផលិតផលស្បែក",
+    "sizeKind" : "none"
+  } ]
+}

@@ -1,0 +1,261 @@
+{
+  "data" : [ {
+    "id" : "97bbf97a-980c-424d-a6ba-63ebf7ea61ed",
+    "slug" : "shop-1026",
+    "name" : "ហាង 1026",
+    "status" : "pending",
+    "type" : "គ្រឿងអលង្ការ",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 1026",
+      "email" : "owner1026@test.com",
+      "phone" : "090001026"
+    },
+    "createdAt" : "2026-10-27T10:23:19.717813Z",
+    "isMine" : false
+  }, {
+    "id" : "18131947-2333-4f06-97c3-2b8ed2f90011",
+    "slug" : "shop-128",
+    "name" : "ហាង 128",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 128",
+      "email" : "owner128@test.com",
+      "phone" : "090000128"
+    },
+    "createdAt" : "2026-10-27T10:23:16.951144Z",
+    "isMine" : false
+  }, {
+    "id" : "9952b61f-3fc0-4b1f-8235-ed643f901465",
+    "slug" : "shop-307",
+    "name" : "ហាង 307",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 307",
+      "email" : "owner307@test.com",
+      "phone" : "090000307"
+    },
+    "createdAt" : "2026-10-27T10:23:16.052184Z",
+    "isMine" : false
+  }, {
+    "id" : "cbeb7ef1-9d3c-4efa-b0e9-bd1aaed3a7b2",
+    "slug" : "shop-314",
+    "name" : "ហាង 314",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 314",
+      "email" : "owner314@test.com",
+      "phone" : "090000314"
+    },
+    "createdAt" : "2026-10-27T10:23:16.351949Z",
+    "isMine" : false
+  }, {
+    "id" : "a6e3c345-617e-4660-a2a6-1fbc07097dba",
+    "slug" : "shop-42",
+    "name" : "ហាង 42",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 42",
+      "email" : "owner42@test.com",
+      "phone" : "090000042"
+    },
+    "createdAt" : "2026-10-27T10:23:17.342904Z",
+    "isMine" : false
+  }, {
+    "id" : "b2163d75-2216-4877-8779-ccf8c62d3a70",
+    "slug" : "shop-49",
+    "name" : "ហាង 49",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 49",
+      "email" : "owner49@test.com",
+      "phone" : "090000049"
+    },
+    "createdAt" : "2026-10-27T10:23:17.487298Z",
+    "isMine" : false
+  }, {
+    "id" : "670eca97-9b8e-4718-adf4-fd6507581f68",
+    "slug" : "shop-521",
+    "name" : "ហាង 521",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 521",
+      "email" : "owner521@test.com",
+      "phone" : "090000521"
+    },
+    "createdAt" : "2026-10-27T10:23:16.852753Z",
+    "isMine" : false
+  }, {
+    "id" : "317352e6-f5fa-4f8f-8a0e-958e28d8ec08",
+    "slug" : "shop-556",
+    "name" : "ហាង 556",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 556",
+      "email" : "owner556@test.com",
+      "phone" : "090000556"
+    },
+    "createdAt" : "2026-10-27T10:23:17.622855Z",
+    "isMine" : false
+  }, {
+    "id" : "57ecf730-30cc-416e-89f8-45eb922c2f7b",
+    "slug" : "shop-663",
+    "name" : "ហាង 663",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 663",
+      "email" : "owner663@test.com",
+      "phone" : "090000663"
+    },
+    "createdAt" : "2026-10-27T10:23:17.987593Z",
+    "isMine" : false
+  }, {
+    "id" : "fe00f382-76e1-4ea0-8415-19839649e438",
+    "slug" : "shop-670",
+    "name" : "ហាង 670",
+    "status" : "pending",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 670",
+      "email" : "owner670@test.com",
+      "phone" : "090000670"
+    },
+    "createdAt" : "2026-10-27T10:23:18.411306Z",
+    "isMine" : false
+  }, {
+    "id" : "a709ff06-fee2-4372-94e8-ea7fab934531",
+    "slug" : "shop-835",
+    "name" : "ហាង 835",
+    "status" : "pending",
+    "type" : "គ្រឿងអលង្ការ",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 835",
+      "email" : "owner835@test.com",
+      "phone" : "090000835"
+    },
+    "createdAt" : "2026-10-27T10:23:17.026007Z",
+    "isMine" : false
+  }, {
+    "id" : "f4058d8b-4ae3-4c1b-996f-e76fb1b5c501",
+    "slug" : "aura-studio",
+    "name" : "AURA Studio",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ហាង",
+      "email" : "admin@aura.test",
+      "phone" : null
+    },
+    "createdAt" : "2026-10-27T10:23:14.097344Z",
+    "isMine" : true
+  }, {
+    "id" : "cd8f5fc2-c1a6-4923-a5dc-85da60504983",
+    "slug" : "shop-577",
+    "name" : "ហាង 577",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 1,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 577",
+      "email" : "owner577@test.com",
+      "phone" : "090000577"
+    },
+    "createdAt" : "2026-10-27T10:23:18.553243Z",
+    "isMine" : false
+  }, {
+    "id" : "531e2630-247a-46d2-9d0a-087df4494620",
+    "slug" : "shop-612",
+    "name" : "ហាង 612",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 2,
+    "accountCount" : 2,
+    "owner" : {
+      "name" : "សុភា",
+      "email" : "owner612@test.com",
+      "phone" : null
+    },
+    "createdAt" : "2026-10-27T10:23:19.420465Z",
+    "isMine" : false
+  }, {
+    "id" : "603c08f4-5fa3-4fe5-8cdd-1ce52ae7be8d",
+    "slug" : "shop-784",
+    "name" : "ហាង 784",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 3,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 784",
+      "email" : "owner784@test.com",
+      "phone" : "090000784"
+    },
+    "createdAt" : "2026-10-27T10:23:18.81047Z",
+    "isMine" : false
+  }, {
+    "id" : "707c9e5e-3b4d-4f44-a730-5d2376b7ee8e",
+    "slug" : "shop-891",
+    "name" : "ហាង 891",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 2,
+    "owner" : {
+      "name" : "ម្ចាស់ 891",
+      "email" : "owner891@test.com",
+      "phone" : "090000891"
+    },
+    "createdAt" : "2026-10-27T10:23:18.979901Z",
+    "isMine" : false
+  }, {
+    "id" : "564ee589-5961-4263-af5a-2695bb5af309",
+    "slug" : "shop-305",
+    "name" : "ហាងថ្មី",
+    "status" : "active",
+    "type" : "ម៉ូដសម្លៀកបំពាក់",
+    "productCount" : 0,
+    "accountCount" : 1,
+    "owner" : {
+      "name" : "ម្ចាស់ 305",
+      "email" : "owner305@test.com",
+      "phone" : "090000305"
+    },
+    "createdAt" : "2026-10-27T10:23:19.247545Z",
+    "isMine" : false
+  } ],
+  "meta" : {
+    "pending" : 11
+  }
+}

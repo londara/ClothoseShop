@@ -1,0 +1,47 @@
+{
+  "data" : {
+    "slug" : "shop-612",
+    "name" : "ហាង 612",
+    "status" : "active",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់",
+      "sizeKind" : "clothing"
+    },
+    "settings" : {
+      "shopName" : "ហាង 612",
+      "telegram" : "shop_612",
+      "announcement" : "សូមស្វាគមន៍! បញ្ជាទិញងាយៗតាមតេឡេក្រាម។",
+      "heroTitle" : "ហាង 612",
+      "heroSubtitle" : "សូមស្វាគមន៍មកកាន់ហាងរបស់យើង។",
+      "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+      "backgroundColor" : "#f8f9fa",
+      "aboutTitle" : "អំពីយើង",
+      "aboutMe" : ""
+    },
+    "categories" : [ {
+      "code" : "women",
+      "label" : "នារី",
+      "sortOrder" : 1
+    }, {
+      "code" : "men",
+      "label" : "បុរស",
+      "sortOrder" : 2
+    }, {
+      "code" : "accessories",
+      "label" : "គ្រឿងបន្លាស់",
+      "sortOrder" : 3
+    }, {
+      "code" : "best-sellers",
+      "label" : "លក់ដាច់បំផុត",
+      "sortOrder" : 99
+    } ],
+    "owner" : {
+      "name" : "សុភា",
+      "title" : "ម្ចាស់ហាង",
+      "email" : "owner612@test.com",
+      "phone" : null,
+      "avatar" : null
+    }
+  }
+}

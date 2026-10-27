@@ -1,0 +1,61 @@
+{
+  "data" : {
+    "id" : "5be85909-f799-4694-a178-d5ff6acb030d",
+    "slug" : "product-5c9392",
+    "name" : "អាវធំកាស្មៀរ",
+    "description" : "ការពិពណ៌នា អាវធំកាស្មៀរ",
+    "price" : 890.5,
+    "stock" : 10,
+    "badge" : "កាស្មៀរសុទ្ធ",
+    "badgeTone" : "gold",
+    "atelier" : "អាតេលីយេ ប៊ីយ៉ែឡា",
+    "categories" : [ "women", "best-sellers" ],
+    "images" : [ "https://example.com/image.jpg" ],
+    "sizes" : [ "S", "M" ],
+    "colors" : [ {
+      "name" : "ខ្មៅ",
+      "hex" : "#111111"
+    } ]
+  },
+  "options" : {
+    "categories" : [ {
+      "code" : "women",
+      "label" : "នារី",
+      "sortOrder" : 1
+    }, {
+      "code" : "men",
+      "label" : "បុរស",
+      "sortOrder" : 2
+    }, {
+      "code" : "accessories",
+      "label" : "គ្រឿងបន្លាស់",
+      "sortOrder" : 3
+    }, {
+      "code" : "best-sellers",
+      "label" : "លក់ដាច់បំផុត",
+      "sortOrder" : 99
+    } ],
+    "typeLabel" : "ម៉ូដសម្លៀកបំពាក់",
+    "sizeKind" : "clothing",
+    "sizes" : [ {
+      "value" : "XS",
+      "hint" : "ទំហំ ៣៤–៣៦"
+    }, {
+      "value" : "S",
+      "hint" : "ទំហំ ៣៨–៤០"
+    }, {
+      "value" : "M",
+      "hint" : "ទំហំ ៤២–៤៤"
+    }, {
+      "value" : "L",
+      "hint" : "ទំហំ ៤៦–៤៨"
+    }, {
+      "value" : "XL",
+      "hint" : "ទំហំ ៥០"
+    }, {
+      "value" : "XXL",
+      "hint" : "ទំហំ ៥២–៥៤"
+    } ],
+    "defaultSizes" : [ "S", "M", "L", "XL" ]
+  }
+}

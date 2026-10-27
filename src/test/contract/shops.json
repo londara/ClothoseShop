@@ -1,0 +1,63 @@
+{
+  "data" : [ {
+    "slug" : "aura-studio",
+    "name" : "AURA Studio",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+    "heroSubtitle" : "",
+    "productCount" : 0
+  }, {
+    "slug" : "shop-577",
+    "name" : "ហាង 577",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+    "heroSubtitle" : "សូមស្វាគមន៍មកកាន់ហាងរបស់យើង។",
+    "productCount" : 1
+  }, {
+    "slug" : "shop-612",
+    "name" : "ហាង 612",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+    "heroSubtitle" : "សូមស្វាគមន៍មកកាន់ហាងរបស់យើង។",
+    "productCount" : 2
+  }, {
+    "slug" : "shop-784",
+    "name" : "ហាង 784",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+    "heroSubtitle" : "សូមស្វាគមន៍មកកាន់ហាងរបស់យើង។",
+    "productCount" : 3
+  }, {
+    "slug" : "shop-891",
+    "name" : "ហាង 891",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://lh3.googleusercontent.com/aida-public/AB6AXuBNYkA4rqezuaikey7yzPjQ69kx_QQHyv11hJbq2Ddz8bbymo1rIh57ipCuu1-U15ZzpobDwkn7MqY5dKC1SJR14BoGL3FKOzljbi_hAwtEk89eKtwiCvQkR1Ca6YMvvIdl7pE2s4D_JcZG9afXzVIXri7XB096uq2VvKLYhORqMRzY_0N9EDexcJnPqn1AHUHMv7ZHEQvlew-62AofCTv7PcWEbMXcUzFnSlQADbW7ZyNfB5E77d1Zjg",
+    "heroSubtitle" : "សូមស្វាគមន៍មកកាន់ហាងរបស់យើង។",
+    "productCount" : 0
+  }, {
+    "slug" : "shop-305",
+    "name" : "ហាងថ្មី",
+    "type" : {
+      "code" : "couture",
+      "label" : "ម៉ូដសម្លៀកបំពាក់"
+    },
+    "heroImage" : "https://example.com/hero.jpg",
+    "heroSubtitle" : "",
+    "productCount" : 0
+  } ]
+}

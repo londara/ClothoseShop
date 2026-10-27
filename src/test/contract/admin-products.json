@@ -1,0 +1,27 @@
+{
+  "data" : [ {
+    "id" : "3dac7e3f-a680-4604-85d0-0f417b9750f8",
+    "slug" : "plain-tee-9e888e",
+    "name" : "Plain tee",
+    "price" : 25.0,
+    "stock" : 10,
+    "badge" : null,
+    "categories" : [ "women" ],
+    "image" : "https://example.com/image.jpg"
+  }, {
+    "id" : "5be85909-f799-4694-a178-d5ff6acb030d",
+    "slug" : "product-5c9392",
+    "name" : "អាវធំកាស្មៀរ",
+    "price" : 890.5,
+    "stock" : 10,
+    "badge" : "កាស្មៀរសុទ្ធ",
+    "categories" : [ "women", "best-sellers" ],
+    "image" : "https://example.com/image.jpg"
+  } ],
+  "meta" : {
+    "page" : 1,
+    "pageSize" : 100,
+    "total" : 2,
+    "pageCount" : 1
+  }
+}

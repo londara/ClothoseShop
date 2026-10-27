@@ -19,13 +19,16 @@ export type PageMeta = {
 }
 
 export class ApiError extends Error {
-  constructor(
-    readonly status: number,
-    readonly code: string,
-    message: string,
-    readonly field?: string
-  ) {
+  // Plain fields (not constructor parameter properties) so Node can run this file in tests.
+  readonly status: number
+  readonly code: string
+  readonly field?: string
+
+  constructor(status: number, code: string, message: string, field?: string) {
     super(message)
+    this.status = status
+    this.code = code
+    this.field = field
   }
 }
 
@@ -124,13 +127,16 @@ export type ApiProduct = {
   description: string | null
   price: number
   stock: number
-  badge: string | null
+  /** Absent (not null) when the product has no badge: the API omits null fields here. */
+  badge?: string | null
   badgeTone: string | null
   atelier: string | null
   categories: string[]
   images: string[]
   sizes?: string[]
   colors?: { name: string; hex: string }[]
+  /** Only on the storefront product detail: "complete the look". */
+  related?: { slug: string; name: string; price: number; image: string | null; atelier: string; badge: string | null }[]
 }
 
 export type ApiProductListItem = {

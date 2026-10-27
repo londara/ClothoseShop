@@ -1,0 +1,25 @@
+{
+  "data" : {
+    "tokenType" : "Bearer",
+    "accessToken" : "<access-token>",
+    "expiresIn" : 900,
+    "refreshToken" : "<refresh-token>",
+    "refreshExpiresIn" : 2592000,
+    "user" : {
+      "id" : "6003d112-c525-4514-8772-4de81928dc73",
+      "name" : "សុភា",
+      "title" : "ម្ចាស់ហាង",
+      "email" : "owner612@test.com",
+      "phone" : null,
+      "avatar" : null,
+      "role" : "owner",
+      "isPlatformAdmin" : false
+    },
+    "shop" : {
+      "id" : "531e2630-247a-46d2-9d0a-087df4494620",
+      "slug" : "shop-612",
+      "name" : "ហាង 612",
+      "status" : "active"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "data" : [ {
+    "id" : "3dac7e3f-a680-4604-85d0-0f417b9750f8",
+    "slug" : "plain-tee-9e888e",
+    "name" : "Plain tee",
+    "description" : "ការពិពណ៌នា Plain tee",
+    "price" : 25.0,
+    "stock" : 10,
+    "badgeTone" : "neutral",
+    "atelier" : "",
+    "categories" : [ "women" ],
+    "images" : [ "https://example.com/image.jpg" ],
+    "sizes" : [ "M" ],
+    "colors" : [ ]
+  }, {
+    "id" : "5be85909-f799-4694-a178-d5ff6acb030d",
+    "slug" : "product-5c9392",
+    "name" : "អាវធំកាស្មៀរ",
+    "description" : "ការពិពណ៌នា អាវធំកាស្មៀរ",
+    "price" : 890.5,
+    "stock" : 10,
+    "badge" : "កាស្មៀរសុទ្ធ",
+    "badgeTone" : "gold",
+    "atelier" : "អាតេលីយេ ប៊ីយ៉ែឡា",
+    "categories" : [ "women", "best-sellers" ],
+    "images" : [ "https://example.com/image.jpg" ],
+    "sizes" : [ "S", "M" ],
+    "colors" : [ {
+      "name" : "ខ្មៅ",
+      "hex" : "#111111"
+    } ]
+  } ],
+  "meta" : {
+    "page" : 1,
+    "pageSize" : 60,
+    "total" : 2,
+    "pageCount" : 1,
+    "categoryCounts" : {
+      "all" : 2,
+      "women" : 2,
+      "men" : 0,
+      "accessories" : 0,
+      "best-sellers" : 1
+    }
+  }
+}

@@ -20,22 +20,11 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { kh } from "@/lib/site"
+import type { ShopRow } from "@/lib/mappers"
 import type { ShopStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-export type ShopRow = {
-  id: string
-  slug: string
-  name: string
-  status: ShopStatus
-  /** Shop type label (from Admin → ប្រភេទហាង). */
-  specialty: string
-  products: number
-  staff: number
-  owner: { name: string; email: string; phone: string } | null
-  createdAt: string | null
-  isMine: boolean
-}
+export type { ShopRow }
 
 const statusStyles: Record<ShopStatus, { label: string; className: string }> = {
   active: { label: "សកម្ម", className: "bg-emerald-100 text-emerald-800" },

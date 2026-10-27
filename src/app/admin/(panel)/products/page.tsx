@@ -7,24 +7,10 @@ import { ProductTable } from "@/components/admin/product-table"
 import { Button } from "@/components/ui/button"
 import { type ApiCategory, type ApiProductListItem } from "@/lib/api"
 import { adminRead, requireAdmin } from "@/lib/auth"
-import { toCategory } from "@/lib/data"
-import type { Product } from "@/lib/products"
+import { toCategory, toProductRow } from "@/lib/mappers"
 import { kh } from "@/lib/site"
 
 export const metadata: Metadata = { title: "ផលិតផលទាំងអស់" }
-
-const toRow = (p: ApiProductListItem): Product => ({
-  id: p.id,
-  slug: p.slug,
-  name: p.name,
-  price: Number(p.price),
-  stock: p.stock,
-  badge: p.badge ?? undefined,
-  categories: p.categories,
-  images: p.image ? [p.image] : [],
-  description: "",
-  atelier: "",
-})
 
 export default async function AdminProductsPage({
   searchParams,
@@ -35,7 +21,7 @@ export default async function AdminProductsPage({
     adminRead<ApiProductListItem[]>("/api/v1/admin/products", 100),
     adminRead<ApiCategory[]>("/api/v1/admin/categories"),
   ])
-  const products = items.data.map(toRow)
+  const products = items.data.map(toProductRow)
 
   return (
     <>

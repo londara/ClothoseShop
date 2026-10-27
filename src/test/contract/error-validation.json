@@ -1,0 +1,7 @@
+{
+  "error" : {
+    "code" : "VALIDATION",
+    "message" : "តម្លៃត្រូវតែជាលេខធំជាង ០",
+    "field" : "price"
+  }
+}

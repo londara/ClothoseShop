@@ -1,0 +1,43 @@
+{
+  "data" : {
+    "categories" : [ {
+      "code" : "women",
+      "label" : "នារី",
+      "sortOrder" : 1
+    }, {
+      "code" : "men",
+      "label" : "បុរស",
+      "sortOrder" : 2
+    }, {
+      "code" : "accessories",
+      "label" : "គ្រឿងបន្លាស់",
+      "sortOrder" : 3
+    }, {
+      "code" : "best-sellers",
+      "label" : "លក់ដាច់បំផុត",
+      "sortOrder" : 99
+    } ],
+    "typeLabel" : "ម៉ូដសម្លៀកបំពាក់",
+    "sizeKind" : "clothing",
+    "sizes" : [ {
+      "value" : "XS",
+      "hint" : "ទំហំ ៣៤–៣៦"
+    }, {
+      "value" : "S",
+      "hint" : "ទំហំ ៣៨–៤០"
+    }, {
+      "value" : "M",
+      "hint" : "ទំហំ ៤២–៤៤"
+    }, {
+      "value" : "L",
+      "hint" : "ទំហំ ៤៦–៤៨"
+    }, {
+      "value" : "XL",
+      "hint" : "ទំហំ ៥០"
+    }, {
+      "value" : "XXL",
+      "hint" : "ទំហំ ៥២–៥៤"
+    } ],
+    "defaultSizes" : [ "S", "M", "L", "XL" ]
+  }
+}

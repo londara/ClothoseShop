@@ -8,6 +8,7 @@ import { api, ApiError, type ApiCategory, type ApiTokens, type ApiUser } from "@
 import { PLATFORM_TAG, shopTag, userTag } from "@/lib/admin-cache"
 import { authed, destroySession, requireAdmin, saveTokens } from "@/lib/auth"
 import { TAGS } from "@/lib/data"
+import { isImageRef } from "@/lib/mappers"
 import type { CategoryOption } from "@/lib/shop-types"
 import type { ShopStatus, UserStatus } from "@/lib/types"
 
@@ -96,14 +97,6 @@ export async function changePassword(_prev: ActionState, form: FormData): Promis
 }
 
 // ── Products ────────────────────────────────────────────────────────────────
-
-/** Same rule as the API: https URLs (no quotes/brackets) or our own upload paths. */
-function isImageRef(value: string) {
-  return (
-    (value.length <= 2048 && /^https:\/\/[^\s"'<>\\`]+$/i.test(value)) ||
-    /^\/uploads\/[a-z0-9-]+\.[a-z]+$/.test(value)
-  )
-}
 
 /** The visitor's IP as seen by this server (first X-Forwarded-For entry), for the API's rate limits. */
 async function clientIp() {

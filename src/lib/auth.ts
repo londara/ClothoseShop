@@ -3,7 +3,8 @@ import { redirect } from "next/navigation"
 import { cache } from "react"
 
 import { cachedGet, cachedMe } from "@/lib/admin-cache"
-import { api, ApiError, type ApiShopSummary, type ApiTokens, type ApiUser } from "@/lib/api"
+import { api, ApiError, type ApiShopSummary, type ApiTokens } from "@/lib/api"
+import { toAdminUser } from "@/lib/mappers"
 import { ACCESS_COOKIE, REFRESH_COOKIE, writeTokenCookies } from "@/lib/session-cookie"
 import type { AdminUser } from "@/lib/types"
 
@@ -20,18 +21,6 @@ export type Session = {
   counts: { pendingStaff: number; pendingShops: number }
 }
 
-export function toAdminUser(u: ApiUser): AdminUser {
-  return {
-    id: u.id,
-    name: u.name,
-    title: u.title ?? "",
-    email: u.email ?? "",
-    phone: u.phone ?? "",
-    avatar: u.avatar ?? "",
-    role: u.role,
-    platformAdmin: u.isPlatformAdmin,
-  }
-}
 
 /** Server actions only: store a token pair from login / sign-up / password change. */
 export async function saveTokens(tokens: ApiTokens) {

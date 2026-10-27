@@ -1,0 +1,28 @@
+{
+  "data" : {
+    "id" : "5be85909-f799-4694-a178-d5ff6acb030d",
+    "slug" : "product-5c9392",
+    "name" : "អាវធំកាស្មៀរ",
+    "description" : "ការពិពណ៌នា អាវធំកាស្មៀរ",
+    "price" : 890.5,
+    "stock" : 10,
+    "badge" : "កាស្មៀរសុទ្ធ",
+    "badgeTone" : "gold",
+    "atelier" : "អាតេលីយេ ប៊ីយ៉ែឡា",
+    "categories" : [ "women", "best-sellers" ],
+    "images" : [ "https://example.com/image.jpg" ],
+    "sizes" : [ "S", "M" ],
+    "colors" : [ {
+      "name" : "ខ្មៅ",
+      "hex" : "#111111"
+    } ],
+    "related" : [ {
+      "slug" : "plain-tee-9e888e",
+      "name" : "Plain tee",
+      "price" : 25.0,
+      "image" : "https://example.com/image.jpg",
+      "atelier" : "",
+      "badge" : null
+    } ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "data" : [ {
+    "id" : "2a528273-45d3-421e-ad4c-2705ec463af4",
+    "name" : "វណ្ណា",
+    "title" : "បុគ្គលិក",
+    "email" : null,
+    "phone" : "090000419",
+    "avatar" : null,
+    "role" : "staff",
+    "status" : "active",
+    "isMe" : false
+  }, {
+    "id" : "6003d112-c525-4514-8772-4de81928dc73",
+    "name" : "សុភា",
+    "title" : "ម្ចាស់ហាង",
+    "email" : "owner612@test.com",
+    "phone" : null,
+    "avatar" : null,
+    "role" : "owner",
+    "status" : "active",
+    "isMe" : true
+  } ]
+}
