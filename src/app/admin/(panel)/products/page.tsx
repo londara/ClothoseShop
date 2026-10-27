@@ -7,13 +7,14 @@ import { ProductTable } from "@/components/admin/product-table"
 import { Button } from "@/components/ui/button"
 import { kh } from "@/lib/site"
 import { requireShopAdmin } from "@/lib/auth"
+import { shopCategories } from "@/lib/shop-types"
 
 export const metadata: Metadata = { title: "ផលិតផលទាំងអស់" }
 
 export default async function AdminProductsPage({
   searchParams,
 }: PageProps<"/admin/products">) {
-  const [{ shop }, { saved }] = await Promise.all([requireShopAdmin(), searchParams])
+  const [{ shop, data }, { saved }] = await Promise.all([requireShopAdmin(), searchParams])
   const { products } = shop
 
   return (
@@ -34,6 +35,7 @@ export default async function AdminProductsPage({
       <ProductTable
         products={products}
         shopSlug={shop.slug}
+        categories={shopCategories(shop, data.shopTypes)}
         saved={saved === "created" || saved === "updated" ? saved : undefined}
       />
     </>

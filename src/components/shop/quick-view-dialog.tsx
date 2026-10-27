@@ -13,14 +13,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { productOrderMessage, useShop } from "@/components/shop/shop-provider"
-import { QuantityStepper, SizePicker } from "@/components/shop/size-picker"
-import type { Product, Size } from "@/lib/products"
+import { ColorPicker, QuantityStepper, SizePicker } from "@/components/shop/size-picker"
+import { defaultChoice, sizesOf, type Product } from "@/lib/products"
 import { formatPrice, kh, telegramUrl } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 function QuickViewBody({ product }: { product: Product }) {
-  const { addToCart, closeQuickView, setCartOpen, shopName, telegram, href } = useShop()
-  const [size, setSize] = React.useState<Size>("M")
+  const { addToCart, closeQuickView, setCartOpen, shopName, telegram, href, sizeKind } = useShop()
+  const sizes = sizesOf(product, sizeKind)
+  const colors = product.colors ?? []
+  const [choice, setChoice] = React.useState(() => defaultChoice(product, sizeKind))
   const [quantity, setQuantity] = React.useState(1)
   const [active, setActive] = React.useState(0)
   const gallery = product.images.slice(0, 4)
@@ -74,19 +76,38 @@ function QuickViewBody({ product }: { product: Product }) {
             {product.description}
           </DialogDescription>
 
-          <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-bold">ជ្រើសរើសទំហំ</span>
-              <Link
-                href={href(`/products/${product.id}`)}
-                onClick={closeQuickView}
-                className="text-xs text-gold underline underline-offset-4"
-              >
-                តារាងទំហំ
-              </Link>
+          {colors.length > 0 && (
+            <div className="mt-5">
+              <span className="mb-2 block text-sm">
+                ពណ៌៖ <strong>{choice.color}</strong>
+              </span>
+              <ColorPicker
+                colors={colors}
+                value={choice.color}
+                onChange={(color) => setChoice((c) => ({ ...c, color }))}
+              />
             </div>
-            <SizePicker value={size} onChange={setSize} />
-          </div>
+          )}
+
+          {sizes.length > 0 && (
+            <div className="mt-5">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-bold">ជ្រើសរើសទំហំ</span>
+                <Link
+                  href={href(`/products/${product.id}`)}
+                  onClick={closeQuickView}
+                  className="text-xs text-gold underline underline-offset-4"
+                >
+                  តារាងទំហំ
+                </Link>
+              </div>
+              <SizePicker
+                sizes={sizes}
+                value={choice.size}
+                onChange={(size) => setChoice((c) => ({ ...c, size }))}
+              />
+            </div>
+          )}
 
           <div className="mt-5 flex items-center justify-between">
             <span className="text-sm font-bold">ចំនួន</span>
@@ -111,7 +132,7 @@ function QuickViewBody({ product }: { product: Product }) {
             variant="secondary"
             className="h-12 rounded-full text-sm font-bold"
             onClick={() => {
-              addToCart(product, size, quantity)
+              addToCart(product, choice, quantity)
               closeQuickView()
               setCartOpen(true)
             }}
@@ -124,7 +145,7 @@ function QuickViewBody({ product }: { product: Product }) {
             className="h-12 rounded-full text-sm font-bold shadow-md"
             render={
               <a
-                href={telegramUrl(telegram, productOrderMessage(shopName, product, size, quantity))}
+                href={telegramUrl(telegram, productOrderMessage(shopName, product, choice, quantity))}
                 target="_blank"
                 rel="noopener noreferrer"
               />

@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/admin/page-header"
 import { ShopTable, type ShopRow } from "@/components/admin/shop-table"
 import { requirePlatformAdmin } from "@/lib/auth"
 import { kh } from "@/lib/site"
+import { shopTypeOf } from "@/lib/shop-types"
 import { ownerOf, readStore } from "@/lib/store"
 
 export const metadata: Metadata = { title: "ហាងទាំងអស់" }
@@ -22,7 +23,7 @@ export default async function ShopsPage() {
         slug: shop.slug,
         name: shop.settings.shopName,
         status: shop.status,
-        specialty: shop.specialty,
+        specialty: shopTypeOf(data.shopTypes, shop.specialty).label,
         products: shop.products.length,
         staff: data.users.filter((u) => u.shopId === shop.id).length,
         owner: owner ? { name: owner.name, email: owner.email, phone: owner.phone } : null,

@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache"
 
 import type { Product } from "@/lib/products"
 import { defaultProfile, type Profile, type Settings } from "@/lib/settings"
+import type { CategoryOption, ShopType } from "@/lib/shop-types"
 import { ownerOf, readStore, toPublicUser, type ShopStatus } from "@/lib/store"
 
 /**
@@ -11,6 +12,7 @@ import { ownerOf, readStore, toPublicUser, type ShopStatus } from "@/lib/store"
 
 export const TAGS = {
   shops: "shops",
+  shopTypes: "shop-types",
   users: "users",
 } as const
 
@@ -20,6 +22,7 @@ export type PublicShop = {
   slug: string
   status: ShopStatus
   specialty: string
+  categories?: CategoryOption[]
   settings: Settings
   products: Product[]
 }
@@ -50,4 +53,12 @@ export async function getShopOwnerProfile(shopId: string): Promise<Profile> {
   if (!owner) return defaultProfile
   const { name, title, email, phone, avatar } = toPublicUser(owner)
   return { name, title, email, phone, avatar }
+}
+
+/** Shop types for the "create a shop" form and storefront categories/sizes. */
+export async function getShopTypes(): Promise<ShopType[]> {
+  "use cache"
+  cacheTag(TAGS.shopTypes)
+  cacheLife("max")
+  return (await readStore()).shopTypes
 }

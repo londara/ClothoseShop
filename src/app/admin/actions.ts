@@ -16,8 +16,14 @@ import {
 } from "@/lib/auth"
 import { TAGS } from "@/lib/data"
 import { hashPassword, verifyPassword } from "@/lib/password"
-import { specialties } from "@/lib/platform"
-import type { Category, Product } from "@/lib/products"
+import type { Product, ProductColor } from "@/lib/products"
+import {
+  shopCategories,
+  shopTypeOf,
+  sizeSetOf,
+  type CategoryOption,
+  type SizeKind,
+} from "@/lib/shop-types"
 import { defaultSettings } from "@/lib/settings"
 import { kh } from "@/lib/site"
 import {
@@ -39,7 +45,6 @@ import {
 
 export type ActionState = { ok?: boolean; message?: string; error?: string }
 
-const CATEGORY_VALUES: Category[] = ["women", "men", "accessories", "best-sellers"]
 
 const text = (form: FormData, key: string) => String(form.get(key) ?? "").trim()
 
@@ -154,7 +159,11 @@ function slugify(name: string) {
   return `${ascii || "product"}-${randomBytes(3).toString("hex")}`
 }
 
-async function readProductForm(form: FormData) {
+async function readProductForm(
+  form: FormData,
+  { categories: options, sizeKind }: { categories: CategoryOption[]; sizeKind: SizeKind }
+) {
+  const allowed = new Set(options.map((c) => c.value))
   const name = text(form, "name")
   const price = Number(text(form, "price"))
   const stock = Number(text(form, "stock") || "0")
@@ -162,7 +171,7 @@ async function readProductForm(form: FormData) {
   const categories = form
     .getAll("categories")
     .map(String)
-    .filter((c): c is Category => CATEGORY_VALUES.includes(c as Category))
+    .filter((c) => allowed.has(c))
 
   if (!name) throw new Error("សូមបញ្ចូលឈ្មោះផលិតផល")
   if (!Number.isFinite(price) || price <= 0) throw new Error("តម្លៃត្រូវតែជាលេខធំជាង ០")
@@ -180,8 +189,26 @@ async function readProductForm(form: FormData) {
   const images = [...kept, ...uploaded, ...urls]
   if (images.length === 0) throw new Error("សូមបន្ថែមរូបភាពយ៉ាងហោចណាស់មួយ")
 
+  // Sizes come from the shop type's size system; colours apply to every type.
+  let sizes: string[] | undefined
+  const sizeSet = sizeSetOf(sizeKind)
+  if (sizeSet) {
+    const picked = new Set(form.getAll("sizes").map(String))
+    sizes = sizeSet.options.map((o) => o.value).filter((v) => picked.has(v))
+    if (sizes.length === 0) throw new Error("សូមជ្រើសរើសទំហំយ៉ាងហោចណាស់មួយ")
+  }
+  const names = form.getAll("colorName").map((v) => String(v).trim())
+  const hexes = form.getAll("colorHex").map(String)
+  if (names.some((n) => !n)) throw new Error("សូមដាក់ឈ្មោះឲ្យពណ៌នីមួយៗ")
+  if (hexes.some((h) => !/^#[0-9a-f]{6}$/i.test(h))) throw new Error("កូដពណ៌មិនត្រឹមត្រូវ")
+  if (new Set(names).size !== names.length) throw new Error("ឈ្មោះពណ៌មិនអាចដដែលៗបានទេ")
+  if (names.length > 12) throw new Error("អាចបន្ថែមពណ៌បានយ៉ាងច្រើន ១២")
+  const colors: ProductColor[] = names.map((name, i) => ({ name: name.slice(0, 30), hex: hexes[i].toLowerCase() }))
+
   const badgeTone = text(form, "badgeTone") === "gold" ? "gold" : "neutral"
   return {
+    sizes,
+    colors: colors.length ? colors : undefined,
     name,
     price,
     stock,
@@ -197,9 +224,15 @@ async function readProductForm(form: FormData) {
 export async function saveProduct(_prev: ActionState, form: FormData): Promise<ActionState> {
   const me = await requireAdmin()
   const id = text(form, "id")
+  const store = await readStore()
+  const myShop = shopOf(store, me)
+  if (!myShop) return { error: "រកមិនឃើញហាងរបស់អ្នក" }
   let fields
   try {
-    fields = await readProductForm(form)
+    fields = await readProductForm(form, {
+      categories: shopCategories(myShop, store.shopTypes),
+      sizeKind: shopTypeOf(store.shopTypes, myShop.specialty).sizeKind,
+    })
   } catch (error) {
     return { error: (error as Error).message }
   }
@@ -383,7 +416,9 @@ export async function startShop(_prev: ActionState, form: FormData): Promise<Act
   if (!/^[A-Za-z0-9_]{5,32}$/.test(telegram)) {
     return { error: "ឈ្មោះអ្នកប្រើតេឡេក្រាមមិនត្រឹមត្រូវ (៥–៣២ តួអក្សរ a-z, 0-9, _)" }
   }
-  if (!specialties.some((s) => s.value === specialty)) return { error: "សូមជ្រើសរើសជំនាញរបស់ហាង" }
+  if (!(await readStore()).shopTypes.some((t) => t.value === specialty)) {
+    return { error: "សូមជ្រើសរើសប្រភេទហាង" }
+  }
 
   const fields = readAccountFields(form)
   if ("error" in fields) return { error: fields.error }
@@ -472,4 +507,33 @@ export async function deleteShop(id: string): Promise<ActionState> {
   updateTag(TAGS.shops)
   updateTag(TAGS.users)
   return { ok: true, message: "បានលុបហាង និងគណនីរបស់ហាងនោះ" }
+}
+
+// ── Product categories (from the product form) ──────────────────────────────
+
+export type AddCategoryResult = { category?: CategoryOption; error?: string }
+
+/**
+ * Adds a category to the signed-in user's shop, straight from the product form.
+ * The first time, the shop's list starts from its type's default categories.
+ * New categories go above "best sellers" so it stays the last filter.
+ */
+export async function addShopCategory(label: string): Promise<AddCategoryResult> {
+  const me = await requireAdmin()
+  const name = label.trim().slice(0, 40)
+  if (!name) return { error: "សូមបញ្ចូលឈ្មោះប្រភេទ" }
+
+  const result = await updateStore((data): AddCategoryResult => {
+    const shop = shopOf(data, me)
+    if (!shop) return { error: "រកមិនឃើញហាងរបស់អ្នក" }
+    const list = shopCategories(shop, data.shopTypes)
+    if (list.some((c) => c.label === name)) return { error: "មានប្រភេទឈ្មោះនេះរួចហើយ" }
+    if (list.length >= 20) return { error: "អាចមានប្រភេទបានយ៉ាងច្រើន ២០" }
+    const category = { value: `c-${randomBytes(3).toString("hex")}`, label: name }
+    const at = list.findIndex((c) => c.value === "best-sellers")
+    shop.categories = at === -1 ? [...list, category] : [...list.slice(0, at), category, ...list.slice(at)]
+    return { category }
+  })
+  if (result.category) updateTag(TAGS.shops)
+  return result
 }

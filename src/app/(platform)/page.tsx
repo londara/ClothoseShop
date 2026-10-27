@@ -22,9 +22,10 @@ import { PlatformHeader } from "@/components/platform/platform-header"
 import { StartShopDialog } from "@/components/platform/start-shop-dialog"
 import Image from "@/components/shop/smart-image"
 import { Button } from "@/components/ui/button"
-import { getActiveShops } from "@/lib/data"
+import { getActiveShops, getShopTypes } from "@/lib/data"
 import { images } from "@/lib/images"
-import { PLATFORM_NAME, specialtyLabel } from "@/lib/platform"
+import { PLATFORM_NAME } from "@/lib/platform"
+import { shopTypeOf } from "@/lib/shop-types"
 import { kh } from "@/lib/site"
 import { FIRST_SHOP_SLUG } from "@/lib/store"
 
@@ -68,7 +69,8 @@ const protocols = [
 ]
 
 export default async function PlatformHomePage() {
-  const shops = await getActiveShops()
+  const [shops, shopTypes] = await Promise.all([getActiveShops(), getShopTypes()])
+  const typeOptions = shopTypes.map(({ value, label }) => ({ value, label }))
   const flagship = shops.find((s) => s.slug === FIRST_SHOP_SLUG) ?? shops[0]
 
   // A few pieces from every shop, interleaved so no single shop fills the rail.
@@ -92,7 +94,7 @@ export default async function PlatformHomePage() {
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-background">
-      <PlatformHeader />
+      <PlatformHeader types={typeOptions} />
 
       <main className="w-full flex-1 pt-28">
         {/* Hero */}
@@ -254,7 +256,7 @@ export default async function PlatformHomePage() {
                   </li>
                 ))}
               </ul>
-              <StartShopDialog className="mt-auto h-12 rounded-full bg-gold text-sm font-bold text-white hover:bg-gold/90">
+              <StartShopDialog types={typeOptions} className="mt-auto h-12 rounded-full bg-gold text-sm font-bold text-white hover:bg-gold/90">
                 ចាប់ផ្តើមបង្កើតហាង
                 <ArrowRight className="size-4" />
               </StartShopDialog>
@@ -324,7 +326,7 @@ export default async function PlatformHomePage() {
                       />
                       <span className="glass absolute top-3 left-3 flex items-center gap-1 rounded-full px-3 py-0.5 text-[11px] font-bold">
                         <BadgeCheck className="size-3.5 text-gold" />
-                        {specialtyLabel(s.specialty)}
+                        {shopTypeOf(shopTypes, s.specialty).label}
                       </span>
                     </div>
                     <div className="flex flex-1 flex-col gap-1 p-5">

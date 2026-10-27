@@ -1,31 +1,38 @@
 "use client"
 
-import { Minus, Plus } from "lucide-react"
+import { Check, Minus, Plus } from "lucide-react"
 
-import { sizes, type Size } from "@/lib/products"
+import type { ProductColor } from "@/lib/products"
+import { sizeHint } from "@/lib/shop-types"
 import { kh } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 export function SizePicker({
+  sizes,
   value,
   onChange,
   showHints = false,
 }: {
-  value: Size
-  onChange: (size: Size) => void
+  sizes: string[]
+  value: string
+  onChange: (size: string) => void
   showHints?: boolean
 }) {
   return (
-    <div role="radiogroup" aria-label="ជ្រើសរើសទំហំ" className="grid grid-cols-4 gap-2">
-      {sizes.map((s) => {
-        const active = s.value === value
+    <div
+      role="radiogroup"
+      aria-label="ជ្រើសរើសទំហំ"
+      className={cn("grid gap-2", sizes.length > 4 ? "grid-cols-3 sm:grid-cols-6" : "grid-cols-4")}
+    >
+      {sizes.map((size) => {
+        const active = size === value
         return (
           <button
-            key={s.value}
+            key={size}
             type="button"
             role="radio"
             aria-checked={active}
-            onClick={() => onChange(s.value)}
+            onClick={() => onChange(size)}
             className={cn(
               "flex flex-col items-center justify-center rounded-2xl border text-sm font-bold transition-all",
               showHints ? "py-2.5" : "rounded-full py-2",
@@ -34,17 +41,57 @@ export function SizePicker({
                 : "border-outline-variant/50 bg-card hover:border-primary"
             )}
           >
-            {s.value}
-            {showHints && (
+            {size}
+            {showHints && sizeHint(size) && (
               <span
                 className={cn(
                   "text-[10px] font-normal",
                   active ? "text-primary-foreground/70" : "text-muted-foreground"
                 )}
               >
-                {s.hint}
+                {sizeHint(size)}
               </span>
             )}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+export function ColorPicker({
+  colors,
+  value,
+  onChange,
+}: {
+  colors: ProductColor[]
+  value: string
+  onChange: (color: string) => void
+}) {
+  return (
+    <div role="radiogroup" aria-label="ជ្រើសរើសពណ៌" className="flex flex-wrap gap-3">
+      {colors.map((c) => {
+        const active = c.name === value
+        return (
+          <button
+            key={c.name}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            aria-label={c.name}
+            title={c.name}
+            onClick={() => onChange(c.name)}
+            className={cn(
+              "relative size-10 rounded-full border-2 p-0.5 transition-all",
+              active ? "border-primary" : "border-transparent hover:border-outline-variant"
+            )}
+          >
+            <span
+              className="flex size-full items-center justify-center rounded-full border border-black/10"
+              style={{ backgroundColor: c.hex }}
+            >
+              {active && <Check className="size-4 text-white mix-blend-difference" />}
+            </span>
           </button>
         )
       })}

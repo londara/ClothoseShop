@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/shop/product-card"
 import { EmptyProducts, FilterPills, SortSelect } from "@/components/shop/product-browser"
 import {
-  categories,
+  ALL_CATEGORIES,
   filterAndSort,
-  type Category,
+  type CategoryOption,
   type Product,
   type SortValue,
 } from "@/lib/products"
@@ -19,15 +19,11 @@ import { cn } from "@/lib/utils"
 
 const PAGE_SIZE = 12
 
-function countByCategory(products: Product[]) {
-  return Object.fromEntries(
-    categories.map((c) => [
-      c.value,
-      c.value === "all"
-        ? products.length
-        : products.filter((p) => p.categories.includes(c.value as Category)).length,
-    ])
-  )
+function countByCategory(products: Product[], categories: CategoryOption[]) {
+  return Object.fromEntries([
+    [ALL_CATEGORIES.value, products.length],
+    ...categories.map((c) => [c.value, products.filter((p) => p.categories.includes(c.value)).length]),
+  ])
 }
 
 function CharterBanner() {
@@ -69,9 +65,9 @@ function CharterBanner() {
 }
 
 export function CatalogueView({ products }: { products: Product[] }) {
-  const { shopName, telegram } = useShop()
-  const counts = React.useMemo(() => countByCategory(products), [products])
-  const [category, setCategory] = React.useState<"all" | Category>("all")
+  const { shopName, telegram, categories } = useShop()
+  const counts = React.useMemo(() => countByCategory(products, categories), [products, categories])
+  const [category, setCategory] = React.useState("all")
   const [sort, setSort] = React.useState<SortValue>("curated")
   const [page, setPage] = React.useState(1)
   const [dense, setDense] = React.useState(false)

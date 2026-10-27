@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { ProductCard } from "@/components/shop/product-card"
+import { useShop } from "@/components/shop/shop-provider"
 import {
   Select,
   SelectContent,
@@ -11,10 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  categories,
+  ALL_CATEGORIES,
   filterAndSort,
   sortOptions,
-  type Category,
   type Product,
   type SortValue,
 } from "@/lib/products"
@@ -26,13 +26,14 @@ export function FilterPills({
   onChange,
   counts,
 }: {
-  value: "all" | Category
-  onChange: (value: "all" | Category) => void
+  value: string
+  onChange: (value: string) => void
   counts?: Record<string, number>
 }) {
+  const { categories } = useShop()
   return (
     <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto py-1">
-      {categories.map((c) => (
+      {[ALL_CATEGORIES, ...categories].map((c) => (
         <button
           key={c.value}
           type="button"
@@ -101,7 +102,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
 
 /** Home page catalogue: sticky filter bar, live count, sort, grid. */
 export function ProductBrowser({ products }: { products: Product[] }) {
-  const [category, setCategory] = React.useState<"all" | Category>("all")
+  const [category, setCategory] = React.useState("all")
   const [sort, setSort] = React.useState<SortValue>("curated")
   const visible = filterAndSort(products, category, sort)
 

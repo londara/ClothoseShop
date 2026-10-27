@@ -34,16 +34,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { productOrderMessage, useShop } from "@/components/shop/shop-provider"
-import { QuantityStepper, SizePicker } from "@/components/shop/size-picker"
-import type { Product, Size } from "@/lib/products"
+import { ColorPicker, QuantityStepper, SizePicker } from "@/components/shop/size-picker"
+import { defaultChoice, sizesOf, type Product } from "@/lib/products"
 import { formatPrice, kh, telegramUrl } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
-const colorways = [
-  { name: "ពណ៌ស្រូវស្រាល", swatch: "#e6dfd3" },
-  { name: "ខ្មៅធ្យូង", swatch: "#1f1f22" },
-  { name: "ពណ៌អូដ្ឋ", swatch: "#c19a6b" },
-]
 
 const galleryLabels = ["ខាងមុខ", "ការធ្លាក់", "ឡេវស្នែង", "វាយនភាព", "រចនាប័ទ្ម", "លម្អិត"]
 
@@ -118,11 +113,12 @@ function SizeGuideDialog() {
 }
 
 export function ProductDetail({ product }: { product: Product }) {
-  const { addToCart, setCartOpen, toggleWishlist, isWishlisted, shopName, telegram } =
+  const { addToCart, setCartOpen, toggleWishlist, isWishlisted, shopName, telegram, sizeKind } =
     useShop()
+  const sizes = sizesOf(product, sizeKind)
+  const colors = product.colors ?? []
   const [active, setActive] = React.useState(0)
-  const [color, setColor] = React.useState(0)
-  const [size, setSize] = React.useState<Size>("M")
+  const [choice, setChoice] = React.useState(() => defaultChoice(product, sizeKind))
   const [quantity, setQuantity] = React.useState(1)
   const saved = isWishlisted(product.id)
   const gallery = product.images
@@ -165,7 +161,9 @@ export function ProductDetail({ product }: { product: Product }) {
             </button>
           </div>
           <div className="absolute inset-x-4 bottom-4 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-            <span className="glass rounded-full px-3 py-1">តួអង្គកម្ពស់ ១៧៨ សង់ទីម៉ែត្រ • ពាក់ទំហំ M</span>
+            {sizes.includes("M") && (
+              <span className="glass rounded-full px-3 py-1">តួអង្គកម្ពស់ ១៧៨ សង់ទីម៉ែត្រ • ពាក់ទំហំ M</span>
+            )}
             <span className="glass rounded-full px-3 py-1">មានក្នុងស្តុកនៅសាឡុងប៉ារីស</span>
           </div>
         </div>
@@ -231,53 +229,37 @@ export function ProductDetail({ product }: { product: Product }) {
           <p className="text-[15px] leading-relaxed text-muted-foreground">{product.description}</p>
         </div>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between text-sm">
-            <span>
-              ពណ៌៖ <strong>{colorways[color].name}</strong>
-            </span>
-            <span className="text-xs font-bold text-gold">ជ្រលក់ពណ៌ធម្មជាតិ</span>
+        {colors.length > 0 && (
+          <div>
+            <div className="mb-2 text-sm">
+              ពណ៌៖ <strong>{choice.color}</strong>
+            </div>
+            <ColorPicker
+              colors={colors}
+              value={choice.color}
+              onChange={(color) => setChoice((c) => ({ ...c, color }))}
+            />
           </div>
-          <div className="flex gap-3">
-            {colorways.map((c, i) => (
-              <button
-                key={c.name}
-                type="button"
-                aria-label={c.name}
-                aria-pressed={i === color}
-                onClick={() => setColor(i)}
-                className={cn(
-                  "size-10 rounded-full border-2 p-0.5 transition-all",
-                  i === color ? "border-primary" : "border-transparent hover:border-outline-variant"
-                )}
-              >
-                <span
-                  className="block size-full rounded-full border border-black/10"
-                  style={{ backgroundColor: c.swatch }}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
+        )}
 
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-bold">ជ្រើសរើសទំហំ</span>
-            <SizeGuideDialog />
+        {sizes.length > 0 && (
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-bold">ជ្រើសរើសទំហំ</span>
+              {sizeKind === "clothing" && <SizeGuideDialog />}
+            </div>
+            <SizePicker
+              sizes={sizes}
+              value={choice.size}
+              onChange={(size) => setChoice((c) => ({ ...c, size }))}
+              showHints
+            />
           </div>
-          <SizePicker value={size} onChange={setSize} showHints />
-          <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="size-1 rounded-full bg-gold" />
-              ការកាត់មានរាងធំធូរ សូមជ្រើសរើសទំហំធម្មតារបស់អ្នក។
-            </span>
-            {product.stock <= 5 && (
-              <span className="shrink-0 font-bold text-destructive">
-                នៅសល់តែ {kh(product.stock)}
-              </span>
-            )}
-          </div>
-        </div>
+        )}
+
+        {product.stock <= 5 && (
+          <p className="-mt-3 text-xs font-bold text-destructive">នៅសល់តែ {kh(product.stock)} ប៉ុណ្ណោះ</p>
+        )}
 
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm font-bold">ចំនួន</span>
@@ -292,7 +274,7 @@ export function ProductDetail({ product }: { product: Product }) {
             nativeButton={false}
             render={
               <a
-                href={telegramUrl(telegram, productOrderMessage(shopName, product, size, quantity))}
+                href={telegramUrl(telegram, productOrderMessage(shopName, product, choice, quantity))}
                 target="_blank"
                 rel="noopener noreferrer"
               />
@@ -306,7 +288,7 @@ export function ProductDetail({ product }: { product: Product }) {
             variant="outline"
             className="h-13 rounded-full border-outline-variant/40 text-sm font-bold"
             onClick={() => {
-              addToCart(product, size, quantity)
+              addToCart(product, choice, quantity)
               setCartOpen(true)
             }}
           >

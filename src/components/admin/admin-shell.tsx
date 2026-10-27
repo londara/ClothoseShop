@@ -67,14 +67,14 @@ function NavLinks({
     <nav className="flex flex-col gap-1">
       {nav
         .filter((item) => allowed(item.access))
-        .map(({ href, label, icon: Icon, exact, access }) => (
+        .map(({ href, label, icon: Icon, exact }) => (
           <Link
             key={href}
             href={href}
             onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm transition-colors",
-              access === "platform" && "mt-3",
+              href === "/admin/shops" && "mt-3",
               isActive(href, exact)
                 ? "bg-primary font-bold text-primary-foreground"
                 : "text-muted-foreground hover:bg-surface-high hover:text-foreground"

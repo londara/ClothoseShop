@@ -19,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { specialtyLabel } from "@/lib/platform"
 import { kh } from "@/lib/site"
 import type { ShopStatus } from "@/lib/store"
 import { cn } from "@/lib/utils"
@@ -29,6 +28,7 @@ export type ShopRow = {
   slug: string
   name: string
   status: ShopStatus
+  /** Shop type label (from Admin → ប្រភេទហាង). */
   specialty: string
   products: number
   staff: number
@@ -72,7 +72,7 @@ function ShopCard({ shop }: { shop: ShopRow }) {
             )}
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span>{specialtyLabel(shop.specialty)}</span>
+            <span>{shop.specialty}</span>
             <span className="flex items-center gap-1">
               <Package className="size-3.5" />
               ផលិតផល {kh(shop.products)}

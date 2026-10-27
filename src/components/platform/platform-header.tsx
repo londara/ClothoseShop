@@ -12,7 +12,7 @@ const links = [
   { href: "#gateway", label: "បើកហាង" },
 ]
 
-export function PlatformHeader() {
+export function PlatformHeader({ types }: { types: { value: string; label: string }[] }) {
   return (
     <div className="fixed inset-x-0 top-0 z-50 flex flex-col">
       <aside
@@ -55,7 +55,7 @@ export function PlatformHeader() {
               <LogIn className="size-4" />
               <span className="hidden sm:inline">ចូល</span>
             </Button>
-            <StartShopDialog className="hidden h-10 rounded-full px-5 text-sm font-bold sm:inline-flex">
+            <StartShopDialog types={types} className="hidden h-10 rounded-full px-5 text-sm font-bold sm:inline-flex">
               <Sparkles className="size-4" />
               បើកហាង
             </StartShopDialog>

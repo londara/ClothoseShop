@@ -5,13 +5,16 @@ import Link from "next/link"
 import { ImagePlus, Loader2, Save, X } from "lucide-react"
 
 import { saveProduct } from "@/app/admin/actions"
+import { CategoryPicker } from "@/components/admin/category-picker"
+import { ProductVariants } from "@/components/admin/product-variants"
 import { useFormAction } from "@/components/admin/use-form-action"
 import Image from "@/components/shop/smart-image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { categories, type Product } from "@/lib/products"
+import type { CategoryOption, Product } from "@/lib/products"
+import type { SizeKind } from "@/lib/shop-types"
 import { cn } from "@/lib/utils"
 
 function Field({
@@ -40,7 +43,20 @@ function Field({
 
 const inputClass = "h-11 rounded-2xl bg-surface-low px-4"
 
-export function ProductForm({ product }: { product?: Product }) {
+export function ProductForm({
+  product,
+  categories,
+  specialty,
+  sizeKind,
+}: {
+  product?: Product
+  /** Categories of the shop's specialty (from the "create a shop" form). */
+  categories: CategoryOption[]
+  /** Specialty label shown above the category choices. */
+  specialty: string
+  /** Size system of the shop's type; "none" → colours only. */
+  sizeKind: SizeKind
+}) {
   const { state, pending, onSubmit } = useFormAction(saveProduct)
   const [existing, setExisting] = React.useState<string[]>(product?.images ?? [])
   const [previews, setPreviews] = React.useState<string[]>([])
@@ -140,28 +156,17 @@ export function ProductForm({ product }: { product?: Product }) {
         </Field>
       </section>
 
+      <ProductVariants product={product} sizeKind={sizeKind} />
+
       <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-4 rounded-3xl border border-outline-variant/30 bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-bold">ប្រភេទ *</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {categories
-              .filter((c) => c.value !== "all")
-              .map((c) => (
-                <label
-                  key={c.value}
-                  className="flex cursor-pointer items-center gap-2 rounded-2xl border border-outline-variant/40 px-3 py-2.5 text-sm has-checked:border-primary has-checked:bg-primary has-checked:text-primary-foreground"
-                >
-                  <input
-                    type="checkbox"
-                    name="categories"
-                    value={c.value}
-                    defaultChecked={product?.categories.includes(c.value as never)}
-                    className="size-4 accent-current"
-                  />
-                  {c.label}
-                </label>
-              ))}
+          <div>
+            <h2 className="text-lg font-bold">ប្រភេទ *</h2>
+            <p className="text-xs text-muted-foreground">
+              ហាង៖ <span className="font-bold text-gold">{specialty}</span> — ជ្រើសរើសមួយ ឬច្រើន ឬបន្ថែមប្រភេទថ្មី
+            </p>
           </div>
+          <CategoryPicker initial={categories} selected={product?.categories ?? []} />
         </section>
 
         <section className="flex flex-col gap-4 rounded-3xl border border-outline-variant/30 bg-card p-6 shadow-sm">

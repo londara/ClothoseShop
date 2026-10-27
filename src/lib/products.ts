@@ -1,6 +1,10 @@
 import { images } from "@/lib/images"
+import { sizeSetOf, type SizeKind } from "@/lib/shop-types"
 
-export type Category = "women" | "men" | "accessories" | "best-sellers"
+export { ALL_CATEGORIES, type CategoryOption } from "@/lib/shop-types"
+
+/** A category value from the shop type's list. */
+export type Category = string
 
 export type Product = {
   id: string
@@ -16,15 +20,13 @@ export type Product = {
   images: string[]
   /** Pieces left in the current serialized cut. */
   stock: number
+  /** Sizes this piece comes in (shop types with a size system). */
+  sizes?: string[]
+  /** Colours this piece comes in. */
+  colors?: ProductColor[]
 }
 
-export const categories: { value: "all" | Category; label: string }[] = [
-  { value: "all", label: "ទាំងអស់" },
-  { value: "women", label: "នារី" },
-  { value: "men", label: "បុរស" },
-  { value: "accessories", label: "គ្រឿងបន្លាស់" },
-  { value: "best-sellers", label: "លក់ដាច់បំផុត" },
-]
+export type ProductColor = { name: string; hex: string }
 
 export const sortOptions = [
   { value: "curated", label: "ជ្រើសរើសពិសេស" },
@@ -34,14 +36,36 @@ export const sortOptions = [
 
 export type SortValue = (typeof sortOptions)[number]["value"]
 
-export const sizes = [
-  { value: "S", hint: "ទំហំ ៣៨–៤០" },
-  { value: "M", hint: "ទំហំ ៤២–៤៤" },
-  { value: "L", hint: "ទំហំ ៤៦–៤៨" },
-  { value: "XL", hint: "ទំហំ ៥០" },
-] as const
+export type Size = string
 
-export type Size = (typeof sizes)[number]["value"]
+/** What the customer picked: empty strings when the product has no sizes/colours. */
+export type Choice = { size: string; color: string }
+
+/**
+ * Sizes shown to customers, from the shop type's size system. Products saved
+ * without sizes get that system's defaults (e.g. S–XL for clothing).
+ */
+export function sizesOf(product: Product, sizeKind: SizeKind): string[] {
+  const set = sizeSetOf(sizeKind)
+  if (!set) return []
+  const chosen = product.sizes?.length ? product.sizes : set.defaults
+  // Keep the size system's order whatever order they were saved in.
+  return set.options.map((o) => o.value).filter((v) => chosen.includes(v))
+}
+
+/** Pre-selected choice: size M when offered (else the first size), first colour. */
+export function defaultChoice(product: Product, sizeKind: SizeKind): Choice {
+  const sizes = sizesOf(product, sizeKind)
+  return {
+    size: sizes.includes("M") ? "M" : (sizes[0] ?? ""),
+    color: product.colors?.[0]?.name ?? "",
+  }
+}
+
+/** "ទំហំ៖ M • ពណ៌៖ ខ្មៅ" — only the parts the product actually has. */
+export function describeChoice({ size, color }: Choice) {
+  return [size && `ទំហំ៖ ${size}`, color && `ពណ៌៖ ${color}`].filter(Boolean).join(" • ")
+}
 
 const { home, cat, pdp } = images
 
@@ -395,7 +419,7 @@ export const defaultProducts: Product[] = [
 
 export function filterAndSort(
   list: Product[],
-  category: "all" | Category,
+  category: string,
   sort: SortValue
 ) {
   const filtered =

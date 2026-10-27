@@ -13,7 +13,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
-import { useShop } from "@/components/shop/shop-provider"
+import { lineKey, useShop } from "@/components/shop/shop-provider"
+import { describeChoice } from "@/lib/products"
 import { formatPrice, kh } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
@@ -59,7 +60,7 @@ export function CartSheet() {
               if (!product) return null
               return (
                 <div
-                  key={`${line.productId}-${line.size}`}
+                  key={lineKey(line)}
                   className="flex items-center gap-3 rounded-2xl border border-outline-variant/30 bg-surface-low p-1.5"
                 >
                   <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-surface-container">
@@ -77,21 +78,23 @@ export function CartSheet() {
                       <button
                         type="button"
                         aria-label="ដកចេញ"
-                        onClick={() => removeFromCart(line.productId, line.size)}
+                        onClick={() => removeFromCart(lineKey(line))}
                         className="text-muted-foreground transition-colors hover:text-destructive"
                       >
                         <X className="size-4" />
                       </button>
                     </div>
-                    <span className="block text-xs text-muted-foreground">
-                      ទំហំ៖ {line.size}
-                    </span>
+                    {describeChoice(line) && (
+                      <span className="block text-xs text-muted-foreground">
+                        {describeChoice(line)}
+                      </span>
+                    )}
                     <div className="mt-1.5 flex items-center justify-between">
                       <div className="flex items-center rounded-full border border-outline-variant/40 bg-card px-1 py-0.5">
                         <button
                           type="button"
                           aria-label="បន្ថយចំនួន"
-                          onClick={() => updateQuantity(line.productId, line.size, -1)}
+                          onClick={() => updateQuantity(lineKey(line), -1)}
                           className="flex size-6 items-center justify-center rounded-full hover:bg-surface-container"
                         >
                           <Minus className="size-3" />
@@ -100,7 +103,7 @@ export function CartSheet() {
                         <button
                           type="button"
                           aria-label="បង្កើនចំនួន"
-                          onClick={() => updateQuantity(line.productId, line.size, 1)}
+                          onClick={() => updateQuantity(lineKey(line), 1)}
                           className="flex size-6 items-center justify-center rounded-full hover:bg-surface-container"
                         >
                           <Plus className="size-3" />

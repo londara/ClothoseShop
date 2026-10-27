@@ -2,6 +2,9 @@
 
 Next.js 16 + shadcn/ui + Tailwind CSS, Khmer only (Battambang font).
 
+For a page-by-page description (data, files, actions, rules) see
+[docs/PAGES.md](docs/PAGES.md).
+
 ## Run
 
 ```bash

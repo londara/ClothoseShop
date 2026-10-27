@@ -12,8 +12,9 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { TelegramFab } from "@/components/layout/telegram-fab"
 import { Button } from "@/components/ui/button"
-import { getShopBySlug, type PublicShop } from "@/lib/data"
+import { getShopBySlug, getShopTypes, type PublicShop } from "@/lib/data"
 import { PLATFORM_NAME } from "@/lib/platform"
+import { shopCategories, shopTypeOf } from "@/lib/shop-types"
 
 /**
  * Shop pages render per request (the shop data itself is cached and invalidated
@@ -63,6 +64,8 @@ export default async function ShopLayout({ params, children }: LayoutProps<"/[sh
   if (!shop) notFound()
   if (shop.status !== "active") return <ShopUnavailable shop={shop} />
   const { settings } = shop
+  const shopTypes = await getShopTypes()
+  const type = shopTypeOf(shopTypes, shop.specialty)
 
   return (
     <div
@@ -74,6 +77,8 @@ export default async function ShopLayout({ params, children }: LayoutProps<"/[sh
         shopName={settings.shopName}
         telegram={settings.telegram}
         slug={shop.slug}
+        sizeKind={type.sizeKind}
+        categories={shopCategories(shop, shopTypes)}
       >
         <SiteHeader announcement={settings.announcement} />
         <main className="w-full flex-1 pt-28">{children}</main>

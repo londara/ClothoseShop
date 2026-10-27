@@ -10,6 +10,7 @@ import {
   type Profile,
   type Settings,
 } from "@/lib/settings"
+import { DEFAULT_SHOP_TYPES, type CategoryOption, type ShopType } from "@/lib/shop-types"
 
 /**
  * File-backed data store. Everything lives in `data/store.json` (created and
@@ -46,6 +47,8 @@ export type Shop = {
   slug: string
   status: ShopStatus
   specialty: string
+  /** Categories the owner added in the product form; unset → the shop type's defaults. */
+  categories?: CategoryOption[]
   settings: Settings
   products: Product[]
   createdAt?: string
@@ -53,6 +56,8 @@ export type Shop = {
 
 export type StoreData = {
   shops: Shop[]
+  /** What shops can sell; managed by the platform admin. */
+  shopTypes: ShopType[]
   users: User[]
   /** HMAC key for admin session cookies, used when AUTH_SECRET is unset. */
   secret: string
@@ -62,6 +67,7 @@ export type StoreData = {
 type LegacyUser = Omit<User, "shopId"> & { shopId?: string }
 type LegacyStoreData = {
   shops?: Shop[]
+  shopTypes?: ShopType[]
   users?: LegacyUser[]
   secret: string
   // single-shop store (v2) / single-profile store (v1)
@@ -97,6 +103,7 @@ async function seed(): Promise<StoreData> {
         products: defaultProducts,
       },
     ],
+    shopTypes: DEFAULT_SHOP_TYPES,
     users: [
       {
         ...defaultProfile,
@@ -151,8 +158,12 @@ function migrate(raw: LegacyStoreData): { data: StoreData; changed: boolean } {
     return { ...u, shopId: firstShopId, platformAdmin: u.role === "owner" || undefined }
   })
 
+  // Stores from before shop types were editable get the starting list.
+  if (!raw.shopTypes) changed = true
+
   const data: StoreData = {
     secret: raw.secret,
+    shopTypes: raw.shopTypes ?? DEFAULT_SHOP_TYPES,
     users: migratedUsers,
     shops: shops.map((s) => ({ ...s, settings: { ...defaultSettings, ...s.settings } })),
   }

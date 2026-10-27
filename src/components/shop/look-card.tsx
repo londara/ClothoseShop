@@ -5,12 +5,12 @@ import Link from "next/link"
 import { Send } from "lucide-react"
 
 import { productOrderMessage, useShop } from "@/components/shop/shop-provider"
-import type { Product } from "@/lib/products"
+import { defaultChoice, type Product } from "@/lib/products"
 import { formatPrice, telegramUrl } from "@/lib/site"
 
 /** Larger editorial card used in the "Complete the look" row. */
 export function LookCard({ product }: { product: Product }) {
-  const { openQuickView, shopName, telegram, href } = useShop()
+  const { openQuickView, shopName, telegram, href, sizeKind } = useShop()
   const image = product.images[1] ?? product.images[0]
 
   return (
@@ -53,7 +53,7 @@ export function LookCard({ product }: { product: Product }) {
           មើលរហ័ស
         </button>
         <a
-          href={telegramUrl(telegram, productOrderMessage(shopName, product, "M", 1))}
+          href={telegramUrl(telegram, productOrderMessage(shopName, product, defaultChoice(product, sizeKind), 1))}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 rounded-full bg-surface-high px-3 py-1 text-xs font-bold transition-colors hover:bg-surface-highest"

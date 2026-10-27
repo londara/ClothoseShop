@@ -6,7 +6,7 @@ import { Eye, Heart, Send, ShoppingBag } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { productOrderMessage, useShop } from "@/components/shop/shop-provider"
-import type { Product } from "@/lib/products"
+import { defaultChoice, type Product } from "@/lib/products"
 import { formatPrice, telegramUrl } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
@@ -17,7 +17,7 @@ export function ProductCard({
   product: Product
   priority?: boolean
 }) {
-  const { addToCart, openQuickView, toggleWishlist, isWishlisted, shopName, telegram, href } =
+  const { addToCart, openQuickView, toggleWishlist, isWishlisted, shopName, telegram, href, sizeKind } =
     useShop()
   const saved = isWishlisted(product.id)
 
@@ -103,7 +103,7 @@ export function ProductCard({
             className="h-9 flex-1 rounded-full px-2 text-xs"
             render={
               <a
-                href={telegramUrl(telegram, productOrderMessage(shopName, product, "M", 1))}
+                href={telegramUrl(telegram, productOrderMessage(shopName, product, defaultChoice(product, sizeKind), 1))}
                 target="_blank"
                 rel="noopener noreferrer"
               />

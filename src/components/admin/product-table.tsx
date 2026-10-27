@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ExternalLink, Pencil, Search, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, ExternalLink, Pencil, Search, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteProduct } from "@/app/admin/actions"
@@ -29,11 +29,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { categories, type Category, type Product } from "@/lib/products"
+import { ALL_CATEGORIES, type CategoryOption, type Product } from "@/lib/products"
 import { formatPrice, kh } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
-const categoryLabel = Object.fromEntries(categories.map((c) => [c.value, c.label]))
+const PAGE_SIZE = 10
+
+/** Page numbers to show: first, last, and the current page ±1, with gaps as "…". */
+function pageList(current: number, count: number): (number | "…")[] {
+  const pages = new Set([1, count, current - 1, current, current + 1])
+  const sorted = [...pages].filter((n) => n >= 1 && n <= count).sort((a, b) => a - b)
+  return sorted.flatMap((n, i) => (i > 0 && n - sorted[i - 1] > 1 ? ["…" as const, n] : [n]))
+}
+
+function Pagination({
+  page,
+  pageCount,
+  total,
+  onPage,
+}: {
+  page: number
+  pageCount: number
+  total: number
+  onPage: (page: number) => void
+}) {
+  const from = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const to = Math.min(page * PAGE_SIZE, total)
+
+  return (
+    <div className="flex flex-col items-center justify-between gap-3 border-t border-outline-variant/30 p-4 sm:flex-row">
+      <span className="text-xs text-muted-foreground">
+        បង្ហាញ {kh(from)}–{kh(to)} នៃ {kh(total)} ផលិតផល
+      </span>
+      {pageCount > 1 && (
+        <nav aria-label="ទំព័រ" className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            aria-label="ទៅទំព័រមុន"
+            disabled={page === 1}
+            onClick={() => onPage(page - 1)}
+          >
+            <ChevronLeft className="size-4" />
+          </Button>
+          {pageList(page, pageCount).map((n, i) =>
+            n === "…" ? (
+              <span key={`gap-${i}`} className="px-1 text-xs text-muted-foreground">
+                …
+              </span>
+            ) : (
+              <Button
+                key={n}
+                variant={n === page ? "default" : "ghost"}
+                size="icon"
+                className="rounded-full text-xs"
+                aria-current={n === page ? "page" : undefined}
+                onClick={() => onPage(n)}
+              >
+                {kh(n)}
+              </Button>
+            )
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            aria-label="ទៅទំព័របន្ទាប់"
+            disabled={page === pageCount}
+            onClick={() => onPage(page + 1)}
+          >
+            <ChevronRight className="size-4" />
+          </Button>
+        </nav>
+      )}
+    </div>
+  )
+}
 
 function DeleteButton({ product }: { product: Product }) {
   const router = useRouter()
@@ -85,15 +157,20 @@ function DeleteButton({ product }: { product: Product }) {
 export function ProductTable({
   products,
   shopSlug,
+  categories,
   saved,
 }: {
   products: Product[]
   shopSlug: string
+  categories: CategoryOption[]
   saved?: "created" | "updated"
 }) {
+  const categoryLabel = Object.fromEntries(categories.map((c) => [c.value, c.label]))
   const router = useRouter()
   const [query, setQuery] = React.useState("")
-  const [category, setCategory] = React.useState<"all" | Category>("all")
+  const [category, setCategory] = React.useState("all")
+  const [page, setPage] = React.useState(1)
+  const topRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     if (!saved) return
@@ -106,25 +183,40 @@ export function ProductTable({
       (category === "all" || p.categories.includes(category)) &&
       (!query.trim() || p.name.includes(query.trim()) || p.id.includes(query.trim()))
   )
+  const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE))
+  // Deleting the last product on the last page leaves that page empty: step back.
+  const current = Math.min(page, pageCount)
+  const pageItems = visible.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE)
+
+  const goTo = (n: number) => {
+    setPage(n)
+    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
-    <div className="rounded-3xl border border-outline-variant/30 bg-card shadow-sm">
+    <div ref={topRef} className="scroll-mt-20 rounded-3xl border border-outline-variant/30 bg-card shadow-sm">
       <div className="flex flex-col gap-3 border-b border-outline-variant/30 p-4 md:flex-row md:items-center md:justify-between">
         <div className="relative md:w-72">
           <Search className="absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(1)
+            }}
             placeholder="ស្វែងរកផលិតផល..."
             className="h-10 rounded-full pl-10"
           />
         </div>
         <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
-          {categories.map((c) => (
+          {[ALL_CATEGORIES, ...categories].map((c) => (
             <button
               key={c.value}
               type="button"
-              onClick={() => setCategory(c.value)}
+              onClick={() => {
+                setCategory(c.value)
+                setPage(1)
+              }}
               className={cn(
                 "rounded-full px-4 py-1 text-xs font-bold whitespace-nowrap transition-colors",
                 category === c.value
@@ -156,7 +248,7 @@ export function ProductTable({
               </TableCell>
             </TableRow>
           )}
-          {visible.map((p) => (
+          {pageItems.map((p) => (
             <TableRow key={p.id}>
               <TableCell className="pl-4">
                 <div className="flex items-center gap-3">
@@ -175,7 +267,7 @@ export function ProductTable({
                 <div className="flex flex-wrap gap-1">
                   {p.categories.map((c) => (
                     <span key={c} className="rounded-full bg-surface-high px-2 py-0.5 text-[11px]">
-                      {categoryLabel[c]}
+                      {categoryLabel[c] ?? c}
                     </span>
                   ))}
                 </div>
@@ -220,6 +312,7 @@ export function ProductTable({
           ))}
         </TableBody>
       </Table>
+      <Pagination page={current} pageCount={pageCount} total={visible.length} onPage={goTo} />
     </div>
   )
 }

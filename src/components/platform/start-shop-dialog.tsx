@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { specialties } from "@/lib/platform"
 import { cn } from "@/lib/utils"
 
 const inputClass = "h-11 rounded-2xl bg-surface-low px-4"
@@ -51,7 +50,9 @@ function Field({
   )
 }
 
-function StartShopForm({ onCancel }: { onCancel: () => void }) {
+type TypeOption = { value: string; label: string }
+
+function StartShopForm({ onCancel, types }: { onCancel: () => void; types: TypeOption[] }) {
   const { state, pending, onSubmit } = useFormAction(startShop)
   const [slug, setSlug] = React.useState("")
   const [slugTouched, setSlugTouched] = React.useState(false)
@@ -112,9 +113,9 @@ function StartShopForm({ onCancel }: { onCancel: () => void }) {
             />
           </div>
         </Field>
-        <Field label="ជំនាញរបស់ហាង *">
-          <div className="grid grid-cols-2 gap-2">
-            {specialties.map((s, i) => (
+        <Field label="ប្រភេទហាង (លក់អ្វី) *">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {types.map((s, i) => (
               <label
                 key={s.value}
                 className={cn(
@@ -198,9 +199,12 @@ function StartShopForm({ onCancel }: { onCancel: () => void }) {
 export function StartShopDialog({
   className,
   children,
+  types,
 }: {
   className?: string
   children: React.ReactNode
+  /** Shop types from Admin → ប្រភេទហាង. */
+  types: TypeOption[]
 }) {
   const [open, setOpen] = React.useState(false)
 
@@ -215,7 +219,7 @@ export function StartShopDialog({
           </DialogDescription>
         </div>
         {/* Remount each time so a reopened dialog starts empty. */}
-        {open && <StartShopForm onCancel={() => setOpen(false)} />}
+        {open && <StartShopForm onCancel={() => setOpen(false)} types={types} />}
       </DialogContent>
     </Dialog>
   )
