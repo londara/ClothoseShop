@@ -5,8 +5,8 @@ import { PackagePlus } from "lucide-react"
 import { PageHeader } from "@/components/admin/page-header"
 import { ProductTable } from "@/components/admin/product-table"
 import { Button } from "@/components/ui/button"
-import { apiAll, type ApiCategory, type ApiProductListItem } from "@/lib/api"
-import { authed, requireAdmin } from "@/lib/auth"
+import { type ApiCategory, type ApiProductListItem } from "@/lib/api"
+import { adminRead, requireAdmin } from "@/lib/auth"
 import { toCategory } from "@/lib/data"
 import type { Product } from "@/lib/products"
 import { kh } from "@/lib/site"
@@ -29,13 +29,13 @@ const toRow = (p: ApiProductListItem): Product => ({
 export default async function AdminProductsPage({
   searchParams,
 }: PageProps<"/admin/products">) {
-  const [{ token, shop }, { saved }] = await Promise.all([requireAdmin(), searchParams])
+  const [{ shop }, { saved }] = await Promise.all([requireAdmin(), searchParams])
   // The table searches and pages in the browser, so it gets the whole list.
   const [items, categories] = await Promise.all([
-    apiAll<ApiProductListItem>("/api/v1/admin/products", 100, token),
-    authed<ApiCategory[]>("/api/v1/admin/categories"),
+    adminRead<ApiProductListItem[]>("/api/v1/admin/products", 100),
+    adminRead<ApiCategory[]>("/api/v1/admin/categories"),
   ])
-  const products = items.map(toRow)
+  const products = items.data.map(toRow)
 
   return (
     <>

@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { cache } from "react"
 
+import { cachedGet, cachedMe } from "@/lib/admin-cache"
 import { api, ApiError, type ApiShopSummary, type ApiTokens, type ApiUser } from "@/lib/api"
 import { ACCESS_COOKIE, REFRESH_COOKIE, writeTokenCookies } from "@/lib/session-cookie"
 import type { AdminUser } from "@/lib/types"
@@ -48,16 +49,12 @@ export async function destroySession() {
   store.delete(REFRESH_COOKIE)
 }
 
-/** The signed-in user (one `/auth/me` call per request), or null. */
+/** The signed-in user (`/auth/me`, cached up to a minute — see lib/admin-cache.ts), or null. */
 export const getSession = cache(async (): Promise<Session | null> => {
   const token = (await cookies()).get(ACCESS_COOKIE)?.value
   if (!token) return null
   try {
-    const { data } = await api<{
-      user: ApiUser
-      shop: ApiShopSummary
-      counts: Session["counts"]
-    }>("/api/v1/auth/me", { token })
+    const data = await cachedMe(token)
     return { token, user: toAdminUser(data.user), shop: data.shop, counts: data.counts }
   } catch (error) {
     // Expired/invalid token, disabled account, suspended shop → signed out.
@@ -89,16 +86,31 @@ export async function requirePlatformAdmin() {
   return session
 }
 
-/**
- * Calls the API as the signed-in user. A 401 means the session ended
- * (e.g. the token was revoked), so the user is sent to the login page.
- */
+/** A 401 means the session ended (e.g. the token was revoked): go to the login page. */
+function onUnauthorized(error: unknown): never {
+  if (error instanceof ApiError && error.status === 401) redirect("/admin/login")
+  throw error
+}
+
+/** Calls the API as the signed-in user, uncached (use it for writes). */
 export async function authed<T>(path: string, options: Parameters<typeof api>[1] = {}) {
   const { token } = await requireAdmin()
   try {
     return await api<T>(path, { ...options, token })
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401) redirect("/admin/login")
-    throw error
+    onUnauthorized(error)
+  }
+}
+
+/**
+ * Reads the admin API as the signed-in user through the server cache
+ * (lib/admin-cache.ts). With `pageSize`, all pages of a list are returned.
+ */
+export async function adminRead<T>(path: string, pageSize?: number) {
+  const { token, shop } = await requireAdmin()
+  try {
+    return await cachedGet<T>(token, shop.id, path, pageSize)
+  } catch (error) {
+    onUnauthorized(error)
   }
 }

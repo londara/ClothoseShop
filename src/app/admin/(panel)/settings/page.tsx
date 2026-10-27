@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { SettingsTabs, type SettingsTab } from "@/components/admin/settings-forms"
-import { authed, requireOwner } from "@/lib/auth"
+import { adminRead, requireOwner } from "@/lib/auth"
 import type { Settings } from "@/lib/settings"
 
 export const metadata: Metadata = { title: "ការកំណត់" }
@@ -11,7 +11,7 @@ const TABS: SettingsTab[] = ["shop", "profile", "security"]
 
 export default async function SettingsPage({ searchParams }: PageProps<"/admin/settings">) {
   const [{ user }, { tab }] = await Promise.all([requireOwner(), searchParams])
-  const { data: settings } = await authed<Settings>("/api/v1/admin/settings")
+  const { data: settings } = await adminRead<Settings>("/api/v1/admin/settings")
   const { name, title, email, phone, avatar } = user
   const initialTab = TABS.find((t) => t === tab) ?? "shop"
 

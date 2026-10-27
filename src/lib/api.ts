@@ -37,11 +37,17 @@ type Options = {
   form?: FormData
   /** Access token; omit for public endpoints. */
   token?: string
+  /**
+   * The visitor's IP, for the API's per-IP limits on login and sign-up. Without it every
+   * request would come from this server's IP and all visitors would share one limit.
+   */
+  clientIp?: string
 }
 
-export async function api<T>(path: string, { method = "GET", body, form, token }: Options = {}) {
+export async function api<T>(path: string, { method = "GET", body, form, token, clientIp }: Options = {}) {
   const headers: Record<string, string> = { Accept: "application/json" }
   if (token) headers.Authorization = `Bearer ${token}`
+  if (clientIp) headers["X-Forwarded-For"] = clientIp
   if (body !== undefined) headers["Content-Type"] = "application/json"
 
   let response: Response

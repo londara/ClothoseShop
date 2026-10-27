@@ -11,6 +11,7 @@ More detail:
 
 - [docs/FRONTEND_PROCESS.md](docs/FRONTEND_PROCESS.md): how each page works.
 - [docs/API_AND_DATABASE.md](docs/API_AND_DATABASE.md): the API contract and database tables.
+- [docs/DATA_CACHING.md](docs/DATA_CACHING.md): how API data is cached, and the implementation steps.
 - [aura-backend/docs/features/18-frontend-integration.md](../aura-backend/docs/features/18-frontend-integration.md):
   how the frontend is connected to the API.
 
@@ -75,7 +76,8 @@ aura-studio/
     │                           staff dialog, login form, useFormAction hook
     └── lib/
         ├── api.ts              fetch wrapper for the API + API response types
-        ├── auth.ts             session (GET /auth/me), requireAdmin/Owner/PlatformAdmin, authed()
+        ├── auth.ts             session (cached /auth/me), requireAdmin/Owner/PlatformAdmin, adminRead() (cached reads), authed() (writes)
+        ├── admin-cache.ts      server cache for the logged-in user: cachedMe, cachedGet, cache tags
         ├── session-cookie.ts   token cookie names + options (shared with proxy.ts)
         ├── data.ts             cached public reads (shops, products, shop types) + mappers
         ├── types.ts            AdminUser, PublicUser, Role, ShopStatus, UserStatus
@@ -102,8 +104,8 @@ aura-studio/
 
 ### Public pages (no login)
 
-Data comes from `lib/data.ts`. It is cached and refreshed when an admin action
-calls `updateTag("shops")`, or after a few minutes for changes made outside the admin.
+Data comes from `lib/data.ts`. It is cached on the server and refreshed as soon as an admin
+action changes it (`updateTag`), or within an hour for changes made outside this website.
 
 | URL | File | What it shows | API |
 |---|---|---|---|
@@ -121,8 +123,10 @@ Old single-shop links (`/catalogue`, `/products/…`) redirect to `/aura-studio/
 
 ### Admin pages (login required)
 
-Every page calls `requireAdmin()` (which checks `GET /api/v1/auth/me`). Calls use the
-signed-in user's token via `authed()`, and the API only returns **that user's shop**.
+Every page calls `requireAdmin()` (which checks `GET /api/v1/auth/me`). Pages read through
+`adminRead()`, which uses the signed-in user's token and is **cached per user** (see
+[docs/DATA_CACHING.md](docs/DATA_CACHING.md)). Writes go through `authed()` and are never
+cached. The API only returns **that user's shop**.
 
 | URL | File | Who | What it does | API |
 |---|---|---|---|---|
@@ -167,7 +171,7 @@ browser ──► Next.js server ───────────────�
 
    Requests sent at the same moment share one refresh, because the API logs a session out
    when a used refresh token is sent again.
-3. **Pages** call `getSession()` → `GET /api/v1/auth/me` (once per request). A 401 or 403
+3. **Pages** call `getSession()` → `GET /api/v1/auth/me` (cached about a minute per user). A 401 or 403
    (disabled account, suspended shop) means the user is logged out.
 4. **Server actions** call `authed(path, { method, body })`. API errors come back as
    `ApiError` and the form shows their Khmer `message`. Images are uploaded first

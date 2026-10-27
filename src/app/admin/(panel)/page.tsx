@@ -14,7 +14,7 @@ import Image from "@/components/shop/smart-image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ApiProductListItem } from "@/lib/api"
-import { authed, requireAdmin } from "@/lib/auth"
+import { adminRead, requireAdmin } from "@/lib/auth"
 import { formatPrice, kh } from "@/lib/site"
 
 type Dashboard = {
@@ -28,7 +28,7 @@ type Dashboard = {
 
 export default async function AdminDashboard() {
   const { user: me } = await requireAdmin()
-  const { data } = await authed<Dashboard>("/api/v1/admin/dashboard")
+  const { data } = await adminRead<Dashboard>("/api/v1/admin/dashboard")
   const { lowStock, pendingStaff: pending } = data
   const products = data.recentProducts.map((p) => ({ ...p, price: Number(p.price) }))
 

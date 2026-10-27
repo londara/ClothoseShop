@@ -2,13 +2,13 @@ import type { Metadata } from "next"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { ProductForm } from "@/components/admin/product-form"
-import { authed } from "@/lib/auth"
+import { adminRead } from "@/lib/auth"
 import { toCategory, type FormOptions } from "@/lib/data"
 
 export const metadata: Metadata = { title: "បន្ថែមផលិតផល" }
 
 export default async function NewProductPage() {
-  const { data: options } = await authed<FormOptions>("/api/v1/admin/products/options")
+  const { data: options } = await adminRead<FormOptions>("/api/v1/admin/products/options")
   return (
     <>
       <PageHeader

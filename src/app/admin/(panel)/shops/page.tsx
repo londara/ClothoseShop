@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { ShopTable, type ShopRow } from "@/components/admin/shop-table"
-import { authed, requirePlatformAdmin } from "@/lib/auth"
+import { adminRead, requirePlatformAdmin } from "@/lib/auth"
 import { kh } from "@/lib/site"
 import type { ShopStatus } from "@/lib/types"
 
@@ -25,7 +25,7 @@ type PlatformShop = {
 export default async function ShopsPage() {
   await requirePlatformAdmin()
   // Pending first, then by name (sorted by the API).
-  const { data } = await authed<PlatformShop[]>("/api/v1/platform/shops")
+  const { data } = await adminRead<PlatformShop[]>("/api/v1/platform/shops")
   const rows: ShopRow[] = data.map((shop) => ({
     id: shop.id,
     slug: shop.slug,

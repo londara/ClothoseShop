@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { PageHeader } from "@/components/admin/page-header"
 import { ProductForm } from "@/components/admin/product-form"
 import { ApiError, type ApiProduct, type Envelope } from "@/lib/api"
-import { authed } from "@/lib/auth"
+import { adminRead } from "@/lib/auth"
 import { toCategory, toProduct, type FormOptions } from "@/lib/data"
 
 export const metadata: Metadata = { title: "កែប្រែផលិតផល" }
@@ -16,7 +16,7 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
   const { id } = await params
   let detail: ProductDetail
   try {
-    detail = (await authed<ApiProduct>(`/api/v1/admin/products/${encodeURIComponent(id)}`)) as ProductDetail
+    detail = (await adminRead<ApiProduct>(`/api/v1/admin/products/${encodeURIComponent(id)}`)) as ProductDetail
   } catch (error) {
     // Unknown ids and other shops' products are "not found".
     if (error instanceof ApiError && (error.status === 404 || error.status === 400)) notFound()

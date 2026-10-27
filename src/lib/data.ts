@@ -8,8 +8,8 @@ import type { ShopStatus } from "@/lib/types"
 
 /**
  * Cached readers for the public site, backed by the API's storefront endpoints.
- * Admin actions invalidate these tags with `updateTag`; changes made elsewhere
- * (e.g. Swagger) show up within a few minutes.
+ * Admin actions invalidate these tags with `updateTag`, so edits show at once;
+ * changes made outside this app (e.g. Swagger) show up within an hour.
  */
 
 export const TAGS = {
@@ -76,7 +76,7 @@ export function toProduct(p: ApiProduct, id: string = p.slug): Product {
 export async function getShopBySlug(slug: string): Promise<PublicShop | undefined> {
   "use cache"
   cacheTag(TAGS.shops, TAGS.users)
-  cacheLife("minutes")
+  cacheLife("hours")
 
   let shop: ApiShopDetail
   try {
@@ -128,7 +128,7 @@ export async function getShopBySlug(slug: string): Promise<PublicShop | undefine
 export async function getActiveShops(): Promise<PublicShop[]> {
   "use cache"
   cacheTag(TAGS.shops)
-  cacheLife("minutes")
+  cacheLife("hours")
   const { data } = await api<{ slug: string }[]>("/api/v1/shops")
   const shops = await Promise.all(data.map((s) => getShopBySlug(s.slug)))
   return shops.filter((s): s is PublicShop => s?.status === "active")

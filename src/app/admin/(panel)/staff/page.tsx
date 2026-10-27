@@ -4,7 +4,7 @@ import { CreateStaffDialog } from "@/components/admin/create-staff-dialog"
 import { PageHeader } from "@/components/admin/page-header"
 import { StaffTable } from "@/components/admin/staff-table"
 import type { ApiUser } from "@/lib/api"
-import { authed, requireOwner } from "@/lib/auth"
+import { adminRead, requireOwner } from "@/lib/auth"
 import { kh } from "@/lib/site"
 import type { PublicUser, UserStatus } from "@/lib/types"
 
@@ -15,7 +15,7 @@ type ApiStaff = Omit<ApiUser, "isPlatformAdmin"> & { status: UserStatus; isMe: b
 export default async function StaffPage() {
   const { user: me } = await requireOwner()
   // Only this shop's accounts, pending first (sorted by the API).
-  const { data } = await authed<ApiStaff[]>("/api/v1/admin/staff")
+  const { data } = await adminRead<ApiStaff[]>("/api/v1/admin/staff")
   const users: PublicUser[] = data.map((u) => ({
     id: u.id,
     name: u.name,

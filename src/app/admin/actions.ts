@@ -1,9 +1,11 @@
 "use server"
 
 import { updateTag } from "next/cache"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 import { api, ApiError, type ApiCategory, type ApiTokens, type ApiUser } from "@/lib/api"
+import { PLATFORM_TAG, shopTag, userTag } from "@/lib/admin-cache"
 import { authed, destroySession, requireAdmin, saveTokens } from "@/lib/auth"
 import { TAGS } from "@/lib/data"
 import type { CategoryOption } from "@/lib/shop-types"
@@ -28,6 +30,16 @@ function failure(error: unknown): ActionState {
   throw error
 }
 
+/**
+ * After a change: drop the cached data of the signed-in user's shop (admin pages,
+ * sessions — lib/admin-cache.ts) plus any `more` tags, e.g. the public storefront
+ * (lib/data.ts). The next render reads fresh data from the API.
+ */
+async function refreshMyShop(...more: string[]) {
+  const { shop } = await requireAdmin()
+  for (const tag of [shopTag(shop.id), ...more]) updateTag(tag)
+}
+
 /** Uploads an image to the signed-in user's shop; returns its `/uploads/...` path. */
 async function upload(file: File) {
   const form = new FormData()
@@ -47,6 +59,7 @@ export async function login(_prev: ActionState, form: FormData): Promise<ActionS
   try {
     const { data } = await api<ApiTokens>("/api/v1/auth/login", {
       method: "POST",
+      clientIp: await clientIp(),
       body: { identifier, password },
     })
     await saveTokens(data)
@@ -62,6 +75,7 @@ export async function logout() {
 }
 
 export async function changePassword(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin()
   try {
     // The API logs out every other device and returns a new pair for this one.
     const { data, message } = await authed<ApiTokens>("/api/v1/auth/password", {
@@ -73,6 +87,8 @@ export async function changePassword(_prev: ActionState, form: FormData): Promis
       },
     })
     await saveTokens(data)
+    // Other devices' cached sessions end now instead of within a minute.
+    updateTag(userTag(user.id))
     return { ok: true, message: message ?? "បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ" }
   } catch (error) {
     return failure(error)
@@ -81,9 +97,18 @@ export async function changePassword(_prev: ActionState, form: FormData): Promis
 
 // ── Products ────────────────────────────────────────────────────────────────
 
-/** Accepts only http(s) URLs or our own upload paths for image fields. */
+/** Same rule as the API: https URLs (no quotes/brackets) or our own upload paths. */
 function isImageRef(value: string) {
-  return /^https?:\/\/\S+$/i.test(value) || /^\/uploads\/[a-z0-9-]+\.[a-z]+$/.test(value)
+  return (
+    (value.length <= 2048 && /^https:\/\/[^\s"'<>\\`]+$/i.test(value)) ||
+    /^\/uploads\/[a-z0-9-]+\.[a-z]+$/.test(value)
+  )
+}
+
+/** The visitor's IP as seen by this server (first X-Forwarded-For entry), for the API's rate limits. */
+async function clientIp() {
+  const h = await headers()
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || undefined
 }
 
 /** Quick checks before uploading files, so a typo doesn't leave orphan uploads. */
@@ -132,7 +157,8 @@ export async function saveProduct(_prev: ActionState, form: FormData): Promise<A
     return failure(error)
   }
 
-  updateTag(TAGS.shops)
+  // Admin lists/dashboard, the storefront, and product counts on the platform page.
+  await refreshMyShop(TAGS.shops, PLATFORM_TAG)
   redirect(`/admin/products?saved=${id ? "updated" : "created"}`)
 }
 
@@ -142,7 +168,7 @@ export async function deleteProduct(id: string): Promise<ActionState> {
   } catch (error) {
     return failure(error)
   }
-  updateTag(TAGS.shops)
+  await refreshMyShop(TAGS.shops, PLATFORM_TAG)
   return { ok: true, message: "បានលុបផលិតផលដោយជោគជ័យ" }
 }
 
@@ -155,7 +181,7 @@ export async function addShopCategory(label: string): Promise<AddCategoryResult>
       method: "POST",
       body: { label },
     })
-    updateTag(TAGS.shops)
+    await refreshMyShop(TAGS.shops)
     return { category: { value: data.code, label: data.label } }
   } catch (error) {
     return failure(error)
@@ -182,7 +208,8 @@ export async function saveSettings(_prev: ActionState, form: FormData): Promise<
         aboutMe: text(form, "aboutMe"),
       },
     })
-    updateTag(TAGS.shops)
+    // The shop name also shows in the sidebar (session) and the platform list.
+    await refreshMyShop(TAGS.shops, PLATFORM_TAG)
     return { ok: true, message: message ?? "បានរក្សាទុកការកំណត់ហាង" }
   } catch (error) {
     return failure(error)
@@ -205,8 +232,8 @@ export async function saveProfile(_prev: ActionState, form: FormData): Promise<A
         avatar,
       },
     })
-    // The owner's profile appears in the storefront "About" section.
-    updateTag(TAGS.users)
+    // My session (sidebar), the staff list, and the owner's profile in the storefront "About".
+    await refreshMyShop(userTag(user.id), TAGS.users)
     return { ok: true, message: message ?? "បានរក្សាទុកព័ត៌មានផ្ទាល់ខ្លួន" }
   } catch (error) {
     return failure(error)
@@ -229,6 +256,8 @@ export async function createStaff(_prev: ActionState, form: FormData): Promise<A
         confirmPassword: text(form, "confirmPassword"),
       },
     })
+    // Staff list, and account counts on the platform page.
+    await refreshMyShop(PLATFORM_TAG)
     return { ok: true, message: message ?? "បានបង្កើតគណនី" }
   } catch (error) {
     return failure(error)
@@ -241,6 +270,8 @@ export async function setStaffStatus(id: string, status: UserStatus): Promise<Ac
       method: "PATCH",
       body: { status },
     })
+    // A disabled staff member's cached session ends now (their /auth/me is tagged by user).
+    await refreshMyShop(userTag(id))
     return { ok: true, message: message ?? "បានប្តូរស្ថានភាពគណនី" }
   } catch (error) {
     return failure(error)
@@ -253,6 +284,7 @@ export async function deleteStaff(id: string): Promise<ActionState> {
   } catch (error) {
     return failure(error)
   }
+  await refreshMyShop(userTag(id), PLATFORM_TAG)
   return { ok: true, message: "បានលុបគណនី" }
 }
 
@@ -267,6 +299,7 @@ export async function startShop(_prev: ActionState, form: FormData): Promise<Act
   try {
     const { data } = await api<ApiTokens>("/api/v1/shops", {
       method: "POST",
+      clientIp: await clientIp(),
       body: {
         shopName: text(form, "shopName"),
         slug: text(form, "slug").toLowerCase(),
@@ -285,7 +318,9 @@ export async function startShop(_prev: ActionState, form: FormData): Promise<Act
   } catch (error) {
     return failure(error)
   }
+  // A new pending shop for the platform admin's list.
   updateTag(TAGS.shops)
+  updateTag(PLATFORM_TAG)
   redirect("/admin?welcome=1")
 }
 
@@ -297,7 +332,8 @@ export async function setShopStatus(id: string, status: ShopStatus): Promise<Act
       method: "PATCH",
       body: { status },
     })
-    updateTag(TAGS.shops)
+    // Storefront, platform list, and that shop's cached sessions (suspended → logged out now).
+    for (const tag of [TAGS.shops, PLATFORM_TAG, shopTag(id)]) updateTag(tag)
     return { ok: true, message: message ?? "បានប្តូរស្ថានភាពហាង" }
   } catch (error) {
     return failure(error)
@@ -311,7 +347,6 @@ export async function deleteShop(id: string): Promise<ActionState> {
   } catch (error) {
     return failure(error)
   }
-  updateTag(TAGS.shops)
-  updateTag(TAGS.users)
+  for (const tag of [TAGS.shops, TAGS.users, PLATFORM_TAG, shopTag(id)]) updateTag(tag)
   return { ok: true, message: "បានលុបហាង និងគណនីរបស់ហាងនោះ" }
 }
