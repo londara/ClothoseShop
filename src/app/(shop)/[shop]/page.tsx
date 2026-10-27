@@ -5,10 +5,9 @@ import { ArrowDown, BadgeCheck, Hammer, Mail, Phone, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductBrowser } from "@/components/shop/product-browser"
 import Image from "@/components/shop/smart-image"
-import { getShopBySlug, getShopOwnerProfile } from "@/lib/data"
-import { shopHref } from "@/lib/platform"
+import { getShopBySlug } from "@/lib/data"
+import { FIRST_SHOP_SLUG, shopHref } from "@/lib/platform"
 import { editorialImages } from "@/lib/products"
-import { FIRST_SHOP_SLUG } from "@/lib/store"
 import { telegramUrl } from "@/lib/site"
 
 const heroBadges = [
@@ -29,7 +28,7 @@ export default async function ShopHomePage({ params }: PageProps<"/[shop]">) {
   if (!shop) notFound()
   if (shop.status !== "active") return null
   const { settings, products } = shop
-  const profile = await getShopOwnerProfile(shop.id)
+  const profile = shop.owner
   const featuredProducts = products.slice(0, 8)
   // The demo story, badges and photos describe the original AURA Studio shop.
   const isFlagship = shop.slug === FIRST_SHOP_SLUG

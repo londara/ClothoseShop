@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { kh } from "@/lib/site"
-import type { ShopStatus } from "@/lib/store"
+import type { ShopStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 export type ShopRow = {

@@ -3,16 +3,27 @@ import { notFound } from "next/navigation"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { ProductForm } from "@/components/admin/product-form"
-import { requireShopAdmin } from "@/lib/auth"
-import { shopCategories, shopTypeOf } from "@/lib/shop-types"
+import { ApiError, type ApiProduct, type Envelope } from "@/lib/api"
+import { authed } from "@/lib/auth"
+import { toCategory, toProduct, type FormOptions } from "@/lib/data"
 
 export const metadata: Metadata = { title: "កែប្រែផលិតផល" }
 
+/** The detail endpoint returns the form options next to the product. */
+type ProductDetail = Envelope<ApiProduct> & { options: FormOptions }
+
 export default async function EditProductPage({ params }: PageProps<"/admin/products/[id]/edit">) {
-  const [{ id }, { shop, data }] = await Promise.all([params, requireShopAdmin()])
-  const type = shopTypeOf(data.shopTypes, shop.specialty)
-  const product = shop.products.find((p) => p.id === id)
-  if (!product) notFound()
+  const { id } = await params
+  let detail: ProductDetail
+  try {
+    detail = (await authed<ApiProduct>(`/api/v1/admin/products/${encodeURIComponent(id)}`)) as ProductDetail
+  } catch (error) {
+    // Unknown ids and other shops' products are "not found".
+    if (error instanceof ApiError && (error.status === 404 || error.status === 400)) notFound()
+    throw error
+  }
+  const { data, options } = detail
+  const product = toProduct(data, data.id)
 
   return (
     <>
@@ -20,9 +31,9 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
       <ProductForm
         key={product.id}
         product={product}
-        categories={shopCategories(shop, data.shopTypes)}
-        specialty={type.label}
-        sizeKind={type.sizeKind}
+        categories={options.categories.map(toCategory)}
+        specialty={options.typeLabel}
+        sizeKind={options.sizeKind}
       />
     </>
   )

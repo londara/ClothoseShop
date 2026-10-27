@@ -4,6 +4,8 @@ const OPTIMIZED_HOSTS = ["lh3.googleusercontent.com"]
 
 function canOptimize(src: ImageProps["src"]) {
   if (typeof src !== "string") return true
+  // Uploads are proxied to the API (next.config rewrites); the browser loads them as-is.
+  if (src.startsWith("/uploads/")) return false
   if (src.startsWith("/")) return true
   try {
     return OPTIMIZED_HOSTS.includes(new URL(src).hostname)

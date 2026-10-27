@@ -1,13 +1,16 @@
-# AURA Studio — Page-by-page reference
+# AURA Studio — Frontend process
 
-A guide to every page of the platform: what it shows, who can open it, where its
-data comes from, which files implement it, and what to keep in mind when
-re-implementing or extending it.
+How the frontend works, page by page: what each page shows, who can open it,
+where its data comes from, which files implement it, and what to keep in mind
+when re-implementing or extending it. The backend counterpart (API endpoints
+and database tables) is [API_AND_DATABASE.md](API_AND_DATABASE.md).
 
 - **Stack:** Next.js 16 (App Router, Cache Components + Partial Prefetching),
   React 19, Tailwind CSS v4, shadcn/ui (Base UI primitives), lucide icons.
 - **Language:** the whole UI is Khmer. Numbers are shown with Khmer digits via
   `kh()` / `formatPrice()` in `src/lib/site.ts`. Font: Battambang (`next/font`).
+- **Backend spec:** API endpoints and database tables are in
+  [API_AND_DATABASE.md](API_AND_DATABASE.md).
 - **Data:** a JSON file store (`data/store.json`) plus uploaded images
   (`data/uploads/`). See [Data model](#data-model).
 
@@ -93,6 +96,11 @@ depends on their `role` and the `platformAdmin` flag.
   flag is set on that user in the store.
 - **Shop owners** are created by the public "open a shop" form.
 - **Staff** are created only by their shop's owner (no public sign-up).
+- **One service, many shops:** after login, every admin read and write is
+  limited to the signed-in user's own shop (`shopOf(data, me)` in
+  `src/app/admin/actions.ts`; staff actions also check `u.shopId === me.shopId`).
+  Another shop's ids behave as "not found". Only the platform admin pages
+  (`/admin/shops`) work across shops. Backend rules: [API_AND_DATABASE.md §4.1](API_AND_DATABASE.md#41-multi-shop-isolation--every-query-is-scoped-to-the-users-shop).
 - Every check runs on the server (`requireAdmin`, `requireOwner`,
   `requirePlatformAdmin`, `requireShopAdmin` in `src/lib/auth.ts`). Hiding a menu
   item is only cosmetic.
@@ -501,6 +509,7 @@ Things that are static, placeholder or worth adding when you build on this:
 | Staff passwords | Staff cannot change their own password | Owner "reset password" or staff Settings → Security |
 | Login lockout / sign-up spam | In-memory lockout; no sign-up rate limit (approval is the filter) | Persistent rate limiting, CAPTCHA |
 | Static content | Reviews, rating 4.9, accordion texts, size guide table, footer addresses/links, flagship editorial | Make editable per shop or remove |
+| Uploaded images | Stored in one shared `data/uploads/` folder, not tied to a shop | Record `shop_id` per upload and only accept a shop's own files (see API_AND_DATABASE.md §2.14, §4.1) |
 | Newsletter form | Shows a toast only | Store emails / connect a mailing service |
 | Size guide | Clothing table only | Tables for shoes / kids sizes |
 | Hosting | Needs a persistent disk for `data/` | Not suitable for serverless file systems as-is |

@@ -5,17 +5,37 @@ import { PackagePlus } from "lucide-react"
 import { PageHeader } from "@/components/admin/page-header"
 import { ProductTable } from "@/components/admin/product-table"
 import { Button } from "@/components/ui/button"
+import { apiAll, type ApiCategory, type ApiProductListItem } from "@/lib/api"
+import { authed, requireAdmin } from "@/lib/auth"
+import { toCategory } from "@/lib/data"
+import type { Product } from "@/lib/products"
 import { kh } from "@/lib/site"
-import { requireShopAdmin } from "@/lib/auth"
-import { shopCategories } from "@/lib/shop-types"
 
 export const metadata: Metadata = { title: "ផលិតផលទាំងអស់" }
+
+const toRow = (p: ApiProductListItem): Product => ({
+  id: p.id,
+  slug: p.slug,
+  name: p.name,
+  price: Number(p.price),
+  stock: p.stock,
+  badge: p.badge ?? undefined,
+  categories: p.categories,
+  images: p.image ? [p.image] : [],
+  description: "",
+  atelier: "",
+})
 
 export default async function AdminProductsPage({
   searchParams,
 }: PageProps<"/admin/products">) {
-  const [{ shop, data }, { saved }] = await Promise.all([requireShopAdmin(), searchParams])
-  const { products } = shop
+  const [{ token, shop }, { saved }] = await Promise.all([requireAdmin(), searchParams])
+  // The table searches and pages in the browser, so it gets the whole list.
+  const [items, categories] = await Promise.all([
+    apiAll<ApiProductListItem>("/api/v1/admin/products", 100, token),
+    authed<ApiCategory[]>("/api/v1/admin/categories"),
+  ])
+  const products = items.map(toRow)
 
   return (
     <>
@@ -35,7 +55,7 @@ export default async function AdminProductsPage({
       <ProductTable
         products={products}
         shopSlug={shop.slug}
-        categories={shopCategories(shop, data.shopTypes)}
+        categories={categories.data.map(toCategory)}
         saved={saved === "created" || saved === "updated" ? saved : undefined}
       />
     </>

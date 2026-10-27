@@ -24,10 +24,8 @@ import Image from "@/components/shop/smart-image"
 import { Button } from "@/components/ui/button"
 import { getActiveShops, getShopTypes } from "@/lib/data"
 import { images } from "@/lib/images"
-import { PLATFORM_NAME } from "@/lib/platform"
-import { shopTypeOf } from "@/lib/shop-types"
+import { FIRST_SHOP_SLUG, PLATFORM_NAME } from "@/lib/platform"
 import { kh } from "@/lib/site"
-import { FIRST_SHOP_SLUG } from "@/lib/store"
 
 const patronPerks = [
   "ការដាក់លក់មានលេខស៊េរី ជាមួយកាតបញ្ជាក់ប្រភពពិតប្រាកដ",
@@ -167,7 +165,7 @@ export default async function PlatformHomePage() {
                 <div className="flex -space-x-2">
                   {shops.slice(0, 4).map((s) => (
                     <span
-                      key={s.id}
+                      key={s.slug}
                       title={s.settings.shopName}
                       className="flex size-9 items-center justify-center rounded-full border-2 border-card bg-gold-soft text-xs font-bold text-on-gold-soft"
                     >
@@ -311,7 +309,7 @@ export default async function PlatformHomePage() {
           ) : (
             <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {shops.map((s) => (
-                <li key={s.id}>
+                <li key={s.slug}>
                   <Link
                     href={`/${s.slug}`}
                     className="group flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/20 bg-card shadow-sm transition-shadow hover:shadow-xl"
@@ -326,7 +324,7 @@ export default async function PlatformHomePage() {
                       />
                       <span className="glass absolute top-3 left-3 flex items-center gap-1 rounded-full px-3 py-0.5 text-[11px] font-bold">
                         <BadgeCheck className="size-3.5 text-gold" />
-                        {shopTypeOf(shopTypes, s.specialty).label}
+                        {s.typeLabel}
                       </span>
                     </div>
                     <div className="flex flex-1 flex-col gap-1 p-5">

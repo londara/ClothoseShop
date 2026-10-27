@@ -2,37 +2,44 @@ import type { Metadata } from "next"
 
 import { PageHeader } from "@/components/admin/page-header"
 import { ShopTable, type ShopRow } from "@/components/admin/shop-table"
-import { requirePlatformAdmin } from "@/lib/auth"
+import { authed, requirePlatformAdmin } from "@/lib/auth"
 import { kh } from "@/lib/site"
-import { shopTypeOf } from "@/lib/shop-types"
-import { ownerOf, readStore } from "@/lib/store"
+import type { ShopStatus } from "@/lib/types"
 
 export const metadata: Metadata = { title: "ហាងទាំងអស់" }
 
-const statusOrder = { pending: 0, active: 1, suspended: 2 }
+type PlatformShop = {
+  id: string
+  slug: string
+  name: string
+  status: ShopStatus
+  /** Shop type label. */
+  type: string
+  productCount: number
+  accountCount: number
+  owner: { name: string; email: string | null; phone: string | null } | null
+  createdAt: string | null
+  isMine: boolean
+}
 
 export default async function ShopsPage() {
-  const me = await requirePlatformAdmin()
-  const data = await readStore()
-
-  const rows: ShopRow[] = data.shops
-    .map((shop) => {
-      const owner = ownerOf(data, shop.id)
-      return {
-        id: shop.id,
-        slug: shop.slug,
-        name: shop.settings.shopName,
-        status: shop.status,
-        specialty: shopTypeOf(data.shopTypes, shop.specialty).label,
-        products: shop.products.length,
-        staff: data.users.filter((u) => u.shopId === shop.id).length,
-        owner: owner ? { name: owner.name, email: owner.email, phone: owner.phone } : null,
-        createdAt: shop.createdAt ?? null,
-        isMine: shop.id === me.shopId,
-      }
-    })
-    .sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.name.localeCompare(b.name))
-
+  await requirePlatformAdmin()
+  // Pending first, then by name (sorted by the API).
+  const { data } = await authed<PlatformShop[]>("/api/v1/platform/shops")
+  const rows: ShopRow[] = data.map((shop) => ({
+    id: shop.id,
+    slug: shop.slug,
+    name: shop.name,
+    status: shop.status,
+    specialty: shop.type,
+    products: shop.productCount,
+    staff: shop.accountCount,
+    owner: shop.owner
+      ? { name: shop.owner.name, email: shop.owner.email ?? "", phone: shop.owner.phone ?? "" }
+      : null,
+    createdAt: shop.createdAt,
+    isMine: shop.isMine,
+  }))
   const pending = rows.filter((r) => r.status === "pending").length
 
   return (

@@ -3,24 +3,30 @@ import type { Metadata } from "next"
 import { CreateStaffDialog } from "@/components/admin/create-staff-dialog"
 import { PageHeader } from "@/components/admin/page-header"
 import { StaffTable } from "@/components/admin/staff-table"
-import { requireOwner, requireShopAdmin } from "@/lib/auth"
+import type { ApiUser } from "@/lib/api"
+import { authed, requireOwner } from "@/lib/auth"
 import { kh } from "@/lib/site"
-import { toPublicUser } from "@/lib/store"
+import type { PublicUser, UserStatus } from "@/lib/types"
 
 export const metadata: Metadata = { title: "បុគ្គលិក" }
 
-export default async function StaffPage() {
-  await requireOwner()
-  const { me, shop, data } = await requireShopAdmin()
-  const users = data.users.filter((u) => u.shopId === shop.id)
-  const pending = users.filter((u) => u.status === "pending").length
+type ApiStaff = Omit<ApiUser, "isPlatformAdmin"> & { status: UserStatus; isMe: boolean }
 
-  // Pending accounts first, then everyone else by name.
-  const sorted = [...users].sort(
-    (a, b) =>
-      Number(b.status === "pending") - Number(a.status === "pending") ||
-      a.name.localeCompare(b.name)
-  )
+export default async function StaffPage() {
+  const { user: me } = await requireOwner()
+  // Only this shop's accounts, pending first (sorted by the API).
+  const { data } = await authed<ApiStaff[]>("/api/v1/admin/staff")
+  const users: PublicUser[] = data.map((u) => ({
+    id: u.id,
+    name: u.name,
+    title: u.title ?? "",
+    email: u.email ?? "",
+    phone: u.phone ?? "",
+    avatar: u.avatar ?? "",
+    role: u.role,
+    status: u.status,
+  }))
+  const pending = users.filter((u) => u.status === "pending").length
 
   return (
     <>
@@ -34,7 +40,7 @@ export default async function StaffPage() {
       >
         <CreateStaffDialog />
       </PageHeader>
-      <StaffTable users={sorted.map(toPublicUser)} currentUserId={me.id} />
+      <StaffTable users={users} currentUserId={me.id} />
     </>
   )
 }

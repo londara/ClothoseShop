@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { Loader2 } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
-import { requireShopAdmin } from "@/lib/auth"
+import { requireAdmin } from "@/lib/auth"
 
 export const metadata: Metadata = {
   title: { default: "ផ្ទាំងគ្រប់គ្រង", template: "%s | ផ្ទាំងគ្រប់គ្រង" },
@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 }
 
 async function AdminGate({ children }: { children: React.ReactNode }) {
-  const { me, shop, data } = await requireShopAdmin()
+  const { user, shop, counts } = await requireAdmin()
   return (
     <AdminShell
-      profile={{ name: me.name, title: me.title, avatar: me.avatar }}
-      isOwner={me.role === "owner"}
-      isPlatformAdmin={!!me.platformAdmin}
-      pendingCount={data.users.filter((u) => u.shopId === shop.id && u.status === "pending").length}
-      pendingShops={me.platformAdmin ? data.shops.filter((s) => s.status === "pending").length : 0}
-      shop={{ name: shop.settings.shopName, slug: shop.slug, status: shop.status }}
+      profile={{ name: user.name, title: user.title, avatar: user.avatar }}
+      isOwner={user.role === "owner"}
+      isPlatformAdmin={user.platformAdmin}
+      pendingCount={counts.pendingStaff}
+      pendingShops={counts.pendingShops}
+      shop={{ name: shop.name, slug: shop.slug, status: shop.status }}
     >
       {children}
     </AdminShell>

@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Uploaded images are stored and served by the API (aura-backend).
+  async rewrites() {
+    const api = (process.env.API_URL || "http://localhost:8080").replace(/\/+$/, "")
+    return [{ source: "/uploads/:file", destination: `${api}/uploads/:file` }]
+  },
   // Links from before the multi-shop platform pointed at the single shop.
   async redirects() {
     return [

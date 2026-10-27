@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { kh } from "@/lib/site"
-import type { ShopStatus } from "@/lib/store"
+import type { ShopStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 type Access = "all" | "owner" | "platform"

@@ -7,7 +7,10 @@ export { ALL_CATEGORIES, type CategoryOption } from "@/lib/shop-types"
 export type Category = string
 
 export type Product = {
+  /** Storefront: the product's URL slug. Admin: the API id (UUID). */
   id: string
+  /** URL slug on the storefront (`/{shop}/products/{slug}`). */
+  slug?: string
   name: string
   price: number
   description: string

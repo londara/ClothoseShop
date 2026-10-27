@@ -13,24 +13,29 @@ import { PageHeader } from "@/components/admin/page-header"
 import Image from "@/components/shop/smart-image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { ApiProductListItem } from "@/lib/api"
+import { authed, requireAdmin } from "@/lib/auth"
 import { formatPrice, kh } from "@/lib/site"
-import { requireShopAdmin } from "@/lib/auth"
+
+type Dashboard = {
+  totalProducts: number
+  totalStock: number
+  stockValue: number
+  lowStock: { id: string; name: string; stock: number }[]
+  recentProducts: ApiProductListItem[]
+  pendingStaff: number
+}
 
 export default async function AdminDashboard() {
-  const { me, shop, data } = await requireShopAdmin()
-  const { products } = shop
-  const pending =
-    me.role === "owner"
-      ? data.users.filter((u) => u.shopId === shop.id && u.status === "pending").length
-      : 0
-  const totalStock = products.reduce((n, p) => n + p.stock, 0)
-  const inventoryValue = products.reduce((n, p) => n + p.stock * p.price, 0)
-  const lowStock = products.filter((p) => p.stock <= 3)
+  const { user: me } = await requireAdmin()
+  const { data } = await authed<Dashboard>("/api/v1/admin/dashboard")
+  const { lowStock, pendingStaff: pending } = data
+  const products = data.recentProducts.map((p) => ({ ...p, price: Number(p.price) }))
 
   const stats = [
-    { label: "ផលិតផលសរុប", value: kh(products.length), icon: Package },
-    { label: "ចំនួនស្តុកសរុប", value: kh(totalStock), icon: Boxes },
-    { label: "តម្លៃស្តុកសរុប", value: formatPrice(inventoryValue), icon: DollarSign },
+    { label: "ផលិតផលសរុប", value: kh(data.totalProducts), icon: Package },
+    { label: "ចំនួនស្តុកសរុប", value: kh(data.totalStock), icon: Boxes },
+    { label: "តម្លៃស្តុកសរុប", value: formatPrice(Number(data.stockValue)), icon: DollarSign },
     { label: "ស្តុកជិតអស់", value: kh(lowStock.length), icon: AlertTriangle },
   ]
 
@@ -90,7 +95,9 @@ export default async function AdminDashboard() {
                 className="flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-surface-low"
               >
                 <span className="relative h-14 w-11 shrink-0 overflow-hidden rounded-xl bg-surface-container">
-                  <Image src={p.images[0]} alt={p.name} fill sizes="44px" className="object-cover" />
+                  {p.image && (
+                    <Image src={p.image} alt={p.name} fill sizes="44px" className="object-cover" />
+                  )}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{p.name}</span>

@@ -291,7 +291,7 @@ export function ProductTable({
                     className="rounded-full"
                     aria-label="មើលក្នុងហាង"
                     nativeButton={false}
-                    render={<Link href={`/${shopSlug}/products/${p.id}`} target="_blank" />}
+                    render={<Link href={`/${shopSlug}/products/${p.slug ?? p.id}`} target="_blank" />}
                   >
                     <ExternalLink className="size-4" />
                   </Button>

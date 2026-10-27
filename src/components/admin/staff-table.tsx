@@ -19,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import type { PublicUser, UserStatus } from "@/lib/store"
+import type { PublicUser, UserStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const statusStyles: Record<UserStatus, { label: string; className: string }> = {
